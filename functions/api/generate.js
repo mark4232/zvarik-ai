@@ -1,7 +1,7 @@
 
 export async function onRequestPost({ request, env }) {
   try {
-    const { prompt, style } = await request.json();
+    const { prompt, style, size } = await request.json();
 
     if (typeof prompt !== "string" || !prompt.trim()) {
       return Response.json(
@@ -27,12 +27,19 @@ export async function onRequestPost({ request, env }) {
     };
 
     const styleText = styles[style] || "high-quality digital art";
+const dimensions = {
+  square: { width: 1024, height: 1024 },
+  portrait: { width: 768, height: 1152 },
+  landscape: { width: 1152, height: 768 }
+};
 
+const imageSize = dimensions[size] || dimensions.square;
     const result = await env.AI.run(
       "@cf/black-forest-labs/flux-1-schnell",
       {
         prompt: `${prompt.trim()}, ${styleText}`,
-        steps: 4
+        steps: 4,
+...imageSize
       }
     );
 
