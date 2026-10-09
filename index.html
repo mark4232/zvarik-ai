@@ -1,0 +1,85 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zvarik AI - Image Generator</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0b1020;color:white;font-family:Arial,sans-serif}
+header{padding:22px 7%;display:flex;justify-content:space-between;
+align-items:center;border-bottom:1px solid #252d43}
+.logo{font-size:25px;font-weight:bold;color:#a78bfa}
+.tag{color:#b9c2d9;font-size:13px}
+main{max-width:850px;margin:65px auto;padding:20px;text-align:center}
+h1{font-size:clamp(34px,6vw,56px);margin-bottom:15px}
+h1 span{color:#a78bfa}
+p{color:#aab4ce;line-height:1.7}
+.panel{margin-top:35px;background:#151c30;padding:22px;
+border:1px solid #303954;border-radius:18px;text-align:left}
+label{display:block;margin:15px 0 10px;font-weight:bold}
+textarea,select{width:100%;padding:15px;background:#0b1020;
+color:white;border:1px solid #39435e;border-radius:10px;font-size:15px}
+textarea{height:125px;resize:vertical}
+button{width:100%;padding:15px;margin-top:18px;border:0;
+border-radius:10px;background:#8b5cf6;color:white;
+font-size:16px;font-weight:bold;cursor:pointer}
+button:hover{background:#7544e8}
+#message{display:none;margin-top:20px;padding:15px;
+background:#202944;border-radius:10px;line-height:1.6}
+.gallery{display:grid;grid-template-columns:repeat(3,1fr);
+gap:12px;margin-top:30px}
+.tile{background:#151c30;border:1px solid #303954;
+border-radius:12px;padding:24px 8px;color:#d5ccff}
+footer{text-align:center;padding:30px;color:#7f8ba8;font-size:13px}
+@media(max-width:550px){main{margin:30px auto}
+.gallery{grid-template-columns:1fr}header{padding:18px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">✦ Zvarik AI</div>
+  <div class="tag">AI Image Studio</div>
+</header>
+<main>
+  <p>YOUR IMAGINATION, YOUR CREATION</p>
+  <h1>Create Amazing Images with <span>AI</span></h1>
+  <p>Describe your idea and turn your imagination into art.</p>
+  <section class="panel">
+    <label for="prompt">Describe your image</label>
+    <textarea id="prompt" placeholder="A beautiful mosque at sunset, cinematic lighting, ultra detailed..."></textarea>
+    <label for="style">Choose an image style</label>
+    <select id="style">
+      <option>Realistic</option>
+      <option>3D Cartoon</option>
+      <option>Anime</option>
+      <option>Islamic Art</option>
+      <option>Cinematic</option>
+      <option>Fantasy</option>
+    </select>
+    <button onclick="generate()">✦ Generate Image</button>
+    <div id="message" role="status"></div>
+  </section>
+  <h2>Explore Your Creativity</h2>
+  <div class="gallery">
+    <div class="tile">✧ Realistic Art</div>
+    <div class="tile">✧ 3D Characters</div>
+    <div class="tile">✧ Fantasy Worlds</div>
+  </div>
+</main>
+<footer>© 2026 Zvarik AI · Imagine. Create. Inspire.</footer>
+<script>
+function generate(){
+  const prompt=document.getElementById('prompt').value.trim();
+  const message=document.getElementById('message');
+  message.style.display='block';
+  if(!prompt){
+    message.textContent='Please describe the image you want to create.';
+    return;
+  }
+  message.textContent='Your prompt is ready! The AI image-generation engine has not been connected yet. We will set that up in the next step.';
+}
+</script>
+</body>
+</html>
