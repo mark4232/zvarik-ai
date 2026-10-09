@@ -49,15 +49,13 @@ footer{text-align:center;padding:30px;color:#7f8ba8;font-size:13px}
   <section class="panel">
     <label for="prompt">Describe your image</label>
     <textarea id="prompt" placeholder="A beautiful mosque at sunset, cinematic lighting, ultra detailed..."></textarea>
-    <label for="style">Choose an image style</label>
-    <select id="style">
-      <option>Realistic</option>
-      <option>3D Cartoon</option>
-      <option>Anime</option>
-      <option>Islamic Art</option>
-      <option>Cinematic</option>
-      <option>Fantasy</option>
-    </select>
+    <label for="style">
+<label for="size">Choose image size</label>
+<select id="size">
+  <option value="square">Square (1:1)</option>
+  <option value="portrait">Portrait (2:3)</option>
+  <option value="landscape">Landscape (3:2)</option>
+</select>
     <button onclick="generate()">✦ Generate Image</button>
     <div id="message" role="status"></div>
   </section>
@@ -74,6 +72,7 @@ footer{text-align:center;padding:30px;color:#7f8ba8;font-size:13px}
 async function generate() {
   const prompt = document.getElementById('prompt').value.trim();
   const style = document.getElementById('style').value;
+  const size = document.getElementById('size').value;
   const message = document.getElementById('message');
   const button = document.querySelector('button');
 
@@ -96,7 +95,7 @@ async function generate() {
     const response = await fetch('/api/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt, style })
+      body: JSON.stringify({ prompt, style, size })
     });
 
     const data = await response.json();
