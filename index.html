@@ -69,17 +69,80 @@ footer{text-align:center;padding:30px;color:#7f8ba8;font-size:13px}
   </div>
 </main>
 <footer>© 2026 Zvarik AI · Imagine. Create. Inspire.</footer>
+
 <script>
-function generate(){
-  const prompt=document.getElementById('prompt').value.trim();
-  const message=document.getElementById('message');
-  message.style.display='block';
-  if(!prompt){
-    message.textContent='Please describe the image you want to create.';
+async function generate() {
+  const prompt = document.getElementById('prompt').value.trim();
+  const style = document.getElementById('style').value;
+  const message = document.getElementById('message');
+  const button = document.querySelector('button');
+
+  message.style.display = 'block';
+
+  if (!prompt) {
+    message.textContent = 'Please describe the image you want to create.';
     return;
   }
-  message.textContent='Your prompt is ready! The AI image-generation engine has not been connected yet. We will set that up in the next step.';
+
+  button.disabled = true;
+  button.textContent = 'Generating...';
+  message.replaceChildren();
+
+  const status = document.createElement('p');
+  status.textContent = 'Creating your image. Please wait...';
+  message.appendChild(status);
+
+  try {
+    const response = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt, style })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Image generation failed.');
+    }
+
+    if (!data.image) {
+      throw new Error('No image was returned. Please try again.');
+    }
+
+    message.replaceChildren();
+
+    const heading = document.createElement('p');
+    heading.textContent = 'Your AI image is ready!';
+    message.appendChild(heading);
+
+    const img = document.createElement('img');
+    img.src = data.image;
+    img.alt = 'AI-generated image';
+    img.style.width = '100%';
+    img.style.display = 'block';
+    img.style.marginTop = '12px';
+    img.style.borderRadius = '12px';
+    message.appendChild(img);
+
+    const download = document.createElement('a');
+    download.href = data.image;
+    download.download = 'zvarik-ai-image.jpg';
+    download.textContent = 'Download Image';
+    download.style.display = 'inline-block';
+    download.style.marginTop = '16px';
+    download.style.color = '#c4b5fd';
+    download.style.fontWeight = 'bold';
+    message.appendChild(download);
+
+  } catch (error) {
+    message.replaceChildren();
+    const errorText = document.createElement('p');
+    errorText.textContent = error.message ||
+      'Something went wrong. Please try again.';
+    message.appendChild(errorText);
+  } finally {
+    button.disabled = false;
+    button.textContent = '✦ Generate Image';
+  }
 }
 </script>
-</body>
-</html>
