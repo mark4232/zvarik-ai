@@ -34,6 +34,16 @@ button:disabled{opacity:.6;cursor:wait}
 .tile{background:#151c30;border:1px solid #303954;border-radius:12px;padding:20px 8px;text-align:center;color:#d5ccff}
 footer{text-align:center;padding:30px;color:#7f8ba8;font-size:13px}
 @media(max-width:550px){main{margin:20px auto}.features{grid-template-columns:1fr}header{padding:18px}.tag{font-size:11px}}
+
+.studio-tabs{display:flex;gap:10px;max-width:850px;margin:24px auto 0;padding:0 20px}
+.studio-tabs button{margin:0;flex:1}
+.studio-tabs button.active{background:#6d45d6}
+.studio-section{max-width:850px;margin:24px auto;padding:20px}
+.studio-section[hidden]{display:none}
+.upload-box{border:2px dashed #596381;border-radius:14px;padding:25px;text-align:center;margin-top:10px}
+.upload-box input{width:100%;margin-top:12px;color:#cbd5e1}
+#videoImagePreview{display:none;width:100%;max-height:400px;object-fit:contain;border-radius:12px;margin-top:16px}
+#videoStatus{display:none;background:#202944;padding:14px;border-radius:10px;margin-top:15px;overflow-wrap:anywhere}
 </style>
 </head>
 <body>
@@ -41,6 +51,11 @@ footer{text-align:center;padding:30px;color:#7f8ba8;font-size:13px}
   <div class="logo">✦ Zvarik AI</div>
   <div class="tag">AI Image Studio</div>
 </header>
+
+<div class="studio-tabs">
+  <button type="button" id="imageTab" class="active">Image Studio</button>
+  <button type="button" id="videoTab">Video Studio</button>
+</div>
 
 <main>
   <section class="hero">
@@ -96,6 +111,37 @@ footer{text-align:center;padding:30px;color:#7f8ba8;font-size:13px}
     <div class="tile">✧ Islamic & Fantasy Art</div>
   </div>
 </main>
+
+<section id="videoStudio" class="studio-section" hidden>
+  <div class="panel">
+    <h2>✦ AI Video Studio</h2>
+    <p>Upload an image and describe how you want the scene to move.</p>
+
+    <label for="videoImage">Upload your image</label>
+    <div class="upload-box">
+      <p>Select an image from your computer</p>
+      <input type="file" id="videoImage" accept="image/png,image/jpeg,image/webp">
+      <img id="videoImagePreview" alt="Selected image preview">
+    </div>
+
+    <label for="videoPrompt">Describe your video scene</label>
+    <textarea id="videoPrompt" maxlength="1500"
+      placeholder="Example: The man walks forward slowly, wind moves his clothes, and the camera follows him cinematically."></textarea>
+
+    <label for="videoDuration">Video duration</label>
+    <select id="videoDuration">
+      <option value="5">5 seconds</option>
+      <option value="8">8 seconds</option>
+      <option value="10">10 seconds</option>
+    </select>
+
+    <button type="button" id="videoGenerateBtn">✦ Generate Video</button>
+
+    <div id="videoStatus" role="status" aria-live="polite">
+      Video generation is not connected yet.
+    </div>
+  </div>
+</section>
 
 <footer>© 2026 Zvarik AI · Imagine. Create. Inspire.</footer>
 
@@ -171,6 +217,76 @@ async function generate() {
     generateBtn.textContent = "✦ Generate Image";
   }
 }
+
+const imageTab = document.getElementById("imageTab");
+const videoTab = document.getElementById("videoTab");
+const imageStudio = document.querySelector("main");
+const videoStudio = document.getElementById("videoStudio");
+const videoImage = document.getElementById("videoImage");
+const videoImagePreview = document.getElementById("videoImagePreview");
+const videoStatus = document.getElementById("videoStatus");
+
+imageTab.addEventListener("click", () => {
+  imageStudio.hidden = false;
+  videoStudio.hidden = true;
+  imageTab.classList.add("active");
+  videoTab.classList.remove("active");
+});
+
+videoTab.addEventListener("click", () => {
+  imageStudio.hidden = true;
+  videoStudio.hidden = false;
+  imageTab.classList.remove("active");
+  videoTab.classList.add("active");
+});
+
+videoImage.addEventListener("change", () => {
+  const file = videoImage.files[0];
+
+  videoImagePreview.style.display = "none";
+
+  if (!file) return;
+
+  if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+    videoStatus.style.display = "block";
+    videoStatus.textContent = "Please select a JPG, PNG, or WebP image.";
+    videoImage.value = "";
+    return;
+  }
+
+  if (file.size > 10 * 1024 * 1024) {
+    videoStatus.style.display = "block";
+    videoStatus.textContent = "Please select an image smaller than 10 MB.";
+    videoImage.value = "";
+    return;
+  }
+
+  videoImagePreview.src = URL.createObjectURL(file);
+  videoImagePreview.style.display = "block";
+  videoStatus.style.display = "block";
+  videoStatus.textContent = "Image selected. Video generation still needs a compatible free AI service.";
+});
+
+document.getElementById("videoGenerateBtn").addEventListener("click", () => {
+  const file = videoImage.files[0];
+  const prompt = document.getElementById("videoPrompt").value.trim();
+
+  videoStatus.style.display = "block";
+
+  if (!file) {
+    videoStatus.textContent = "Please upload an image first.";
+    return;
+  }
+
+  if (!prompt) {
+    videoStatus.textContent = "Please describe the scene you want in your video.";
+    return;
+  }
+
+  videoStatus.textContent =
+    "Your image and scene prompt are ready. The free video-generation service has not been connected yet.";
+});
+
 </script>
 </body>
 </html>
