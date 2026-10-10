@@ -4,37 +4,36 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Zvarik AI - Image Generator</title>
+<meta name="theme-color" content="#0b1020">
+<meta name="description" content="Create AI images with Zvarik AI. Choose your image style, size, and prompt.">
+<title>Zvarik AI - AI Image Generator</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#0b1020;color:white;font-family:Arial,sans-serif}
-header{padding:22px 7%;display:flex;justify-content:space-between;
-align-items:center;border-bottom:1px solid #252d43}
+body{margin:0;background:#0b1020;color:#fff;font-family:Arial,sans-serif}
+header{padding:20px 7%;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #252d43}
 .logo{font-size:25px;font-weight:bold;color:#a78bfa}
 .tag{color:#b9c2d9;font-size:13px}
-main{max-width:850px;margin:65px auto;padding:20px;text-align:center}
-h1{font-size:clamp(34px,6vw,56px);margin-bottom:15px}
+main{max-width:850px;margin:45px auto;padding:20px}
+.hero{text-align:center}
+h1{font-size:clamp(34px,6vw,54px);margin:16px 0}
 h1 span{color:#a78bfa}
 p{color:#aab4ce;line-height:1.7}
-.panel{margin-top:35px;background:#151c30;padding:22px;
-border:1px solid #303954;border-radius:18px;text-align:left}
-label{display:block;margin:15px 0 10px;font-weight:bold}
-textarea,select{width:100%;padding:15px;background:#0b1020;
-color:white;border:1px solid #39435e;border-radius:10px;font-size:15px}
+.panel,.result{margin-top:28px;background:#151c30;padding:22px;border:1px solid #303954;border-radius:18px}
+label{display:block;margin:17px 0 9px;font-weight:bold}
+textarea,select{width:100%;padding:14px;background:#0b1020;color:white;border:1px solid #39435e;border-radius:10px;font-size:15px}
 textarea{height:125px;resize:vertical}
-button{width:100%;padding:15px;margin-top:18px;border:0;
-border-radius:10px;background:#8b5cf6;color:white;
-font-size:16px;font-weight:bold;cursor:pointer}
+select{cursor:pointer}
+button{width:100%;padding:15px;margin-top:18px;border:0;border-radius:10px;background:#8b5cf6;color:white;font-size:16px;font-weight:bold;cursor:pointer}
 button:hover{background:#7544e8}
-#message{display:none;margin-top:20px;padding:15px;
-background:#202944;border-radius:10px;line-height:1.6}
-.gallery{display:grid;grid-template-columns:repeat(3,1fr);
-gap:12px;margin-top:30px}
-.tile{background:#151c30;border:1px solid #303954;
-border-radius:12px;padding:24px 8px;color:#d5ccff}
+button:disabled{opacity:.6;cursor:wait}
+#message{display:none;margin-top:18px;padding:13px;background:#202944;border-radius:10px;line-height:1.6;overflow-wrap:anywhere}
+#resultImage{display:none;width:100%;height:auto;margin-top:16px;border-radius:12px}
+.download{display:none;text-align:center;margin-top:15px;padding:14px;border-radius:10px;background:#8b5cf6;color:white;text-decoration:none;font-weight:bold}
+.small{font-size:12px;color:#8d9ab7}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:28px}
+.tile{background:#151c30;border:1px solid #303954;border-radius:12px;padding:20px 8px;text-align:center;color:#d5ccff}
 footer{text-align:center;padding:30px;color:#7f8ba8;font-size:13px}
-@media(max-width:550px){main{margin:30px auto}
-.gallery{grid-template-columns:1fr}header{padding:18px}}
+@media(max-width:550px){main{margin:20px auto}.features{grid-template-columns:1fr}header{padding:18px}.tag{font-size:11px}}
 </style>
 </head>
 <body>
@@ -42,106 +41,136 @@ footer{text-align:center;padding:30px;color:#7f8ba8;font-size:13px}
   <div class="logo">✦ Zvarik AI</div>
   <div class="tag">AI Image Studio</div>
 </header>
+
 <main>
-  <p>YOUR IMAGINATION, YOUR CREATION</p>
-  <h1>Create Amazing Images with <span>AI</span></h1>
-  <p>Describe your idea and turn your imagination into art.</p>
+  <section class="hero">
+    <p>YOUR IMAGINATION, YOUR CREATION</p>
+    <h1>Create Amazing Images with <span>AI</span></h1>
+    <p>Write your idea, select a style and size, and create your image.</p>
+  </section>
+
   <section class="panel">
     <label for="prompt">Describe your image</label>
-    <textarea id="prompt" placeholder="A beautiful mosque at sunset, cinematic lighting, ultra detailed..."></textarea>
-    <label for="style">
-<label for="size">Choose image size</label>
-<select id="size">
-  <option value="square">Square (1:1)</option>
-  <option value="portrait">Portrait (2:3)</option>
-  <option value="landscape">Landscape (3:2)</option>
-</select>
-    <button onclick="generate()">✦ Generate Image</button>
-    <div id="message" role="status"></div>
+    <textarea id="prompt" maxlength="1800" placeholder="Example: A beautiful mosque at sunset, golden light, detailed architecture..."></textarea>
+
+    <label for="style">Choose image type / style</label>
+    <select id="style">
+      <option value="Realistic">Realistic / Photorealistic</option>
+      <option value="3D Animation">3D Animation Style</option>
+      <option value="Cartoon">Cartoon</option>
+      <option value="Anime">Anime</option>
+      <option value="Islamic Art">Islamic Art</option>
+      <option value="Islamic Calligraphy">Islamic Calligraphy</option>
+      <option value="Cinematic">Cinematic</option>
+      <option value="Fantasy">Fantasy</option>
+      <option value="Nature">Nature and Landscapes</option>
+      <option value="Logo">Logo Concept</option>
+      <option value="Product Photography">Product Photography</option>
+      <option value="Digital Art">Digital Art</option>
+      <option value="Watercolor">Watercolor Painting</option>
+      <option value="Oil Painting">Oil Painting</option>
+      <option value="Pixel Art">Pixel Art</option>
+      <option value="Cute 3D Character">Cute 3D Character</option>
+      <option value="Architecture">Architecture</option>
+      <option value="Comic Book">Comic Book</option>
+    </select>
+
+    <label for="size">Choose image size</label>
+    <select id="size">
+      <option value="square">Square (1:1)</option>
+      <option value="portrait">Portrait (2:3)</option>
+      <option value="landscape">Landscape (3:2)</option>
+    </select>
+
+    <button id="generateBtn" type="button">✦ Generate Image</button>
+    <div id="message" role="status" aria-live="polite"></div>
+    <img id="resultImage" alt="Your AI-generated image">
+    <a id="downloadBtn" class="download" download="zvarik-ai-image.jpg">Download Image</a>
+    <p class="small">Image generation may take a little time. Availability depends on the AI service and its usage limits.</p>
   </section>
-  <h2>Explore Your Creativity</h2>
-  <div class="gallery">
+
+  <h2 style="text-align:center;margin-top:36px">Explore Your Creativity</h2>
+  <div class="features">
     <div class="tile">✧ Realistic Art</div>
     <div class="tile">✧ 3D Characters</div>
-    <div class="tile">✧ Fantasy Worlds</div>
+    <div class="tile">✧ Islamic & Fantasy Art</div>
   </div>
 </main>
+
 <footer>© 2026 Zvarik AI · Imagine. Create. Inspire.</footer>
 
 <script>
-async function generate() {
-  const prompt = document.getElementById('prompt').value.trim();
-  const style = document.getElementById('style').value;
-  const size = document.getElementById('size').value;
-  const message = document.getElementById('message');
-  const button = document.querySelector('button');
+const generateBtn = document.getElementById("generateBtn");
+const promptInput = document.getElementById("prompt");
+const styleInput = document.getElementById("style");
+const sizeInput = document.getElementById("size");
+const message = document.getElementById("message");
+const resultImage = document.getElementById("resultImage");
+const downloadBtn = document.getElementById("downloadBtn");
 
-  message.style.display = 'block';
+generateBtn.addEventListener("click", generate);
+
+async function generate() {
+  const prompt = promptInput.value.trim();
+  const style = styleInput.value;
+  const size = sizeInput.value;
+
+  message.style.display = "block";
+  resultImage.style.display = "none";
+  downloadBtn.style.display = "none";
+  resultImage.removeAttribute("src");
+  downloadBtn.removeAttribute("href");
 
   if (!prompt) {
-    message.textContent = 'Please describe the image you want to create.';
+    message.textContent = "Please describe the image you want to create.";
+    promptInput.focus();
     return;
   }
 
-  button.disabled = true;
-  button.textContent = 'Generating...';
-  message.replaceChildren();
-
-  const status = document.createElement('p');
-  status.textContent = 'Creating your image. Please wait...';
-  message.appendChild(status);
+  generateBtn.disabled = true;
+  generateBtn.textContent = "Generating...";
+  message.textContent = "Creating your image. Please wait...";
 
   try {
-    const response = await fetch('/api/generate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt, style, size })
+    const response = await fetch("/api/generate", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({prompt, style, size})
     });
 
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.error || 'Image generation failed.');
+      throw new Error(data.error || "Image generation failed.");
     }
 
-    if (!data.image) {
-      throw new Error('No image was returned. Please try again.');
+    if (!data.image || !data.image.startsWith("data:image/")) {
+      throw new Error("The AI service returned no usable image. Please try again.");
     }
 
-    message.replaceChildren();
+    resultImage.onload = () => {
+      message.textContent = "Your image is ready!";
+      resultImage.style.display = "block";
+      downloadBtn.href = data.image;
+      downloadBtn.style.display = "block";
+    };
 
-    const heading = document.createElement('p');
-    heading.textContent = 'Your AI image is ready!';
-    message.appendChild(heading);
+    resultImage.onerror = () => {
+      resultImage.style.display = "none";
+      message.textContent = "The image could not be displayed. Please try again.";
+    };
 
-    const img = document.createElement('img');
-    img.src = data.image;
-    img.alt = 'AI-generated image';
-    img.style.width = '100%';
-    img.style.display = 'block';
-    img.style.marginTop = '12px';
-    img.style.borderRadius = '12px';
-    message.appendChild(img);
-
-    const download = document.createElement('a');
-    download.href = data.image;
-    download.download = 'zvarik-ai-image.jpg';
-    download.textContent = 'Download Image';
-    download.style.display = 'inline-block';
-    download.style.marginTop = '16px';
-    download.style.color = '#c4b5fd';
-    download.style.fontWeight = 'bold';
-    message.appendChild(download);
+    resultImage.src = data.image;
+    downloadBtn.href = data.image;
 
   } catch (error) {
-    message.replaceChildren();
-    const errorText = document.createElement('p');
-    errorText.textContent = error.message ||
-      'Something went wrong. Please try again.';
-    message.appendChild(errorText);
+    message.textContent = error.message ||
+      "Something went wrong. Please try again.";
   } finally {
-    button.disabled = false;
-    button.textContent = '✦ Generate Image';
+    generateBtn.disabled = false;
+    generateBtn.textContent = "✦ Generate Image";
   }
 }
 </script>
+</body>
+</html>
