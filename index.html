@@ -152,8 +152,24 @@ $("videoImage").addEventListener("change", () => {
   if (!file.type.startsWith("image/")) { $("videoStatus").textContent = "Please choose a valid image file."; return; }
   selectedImage = file;
   const url = URL.createObjectURL(file);
-  const img = document.createElement("img"); img.src = url; img.alt = "Selected image";
-  const box = $("videoPreviewBox"); box.innerHTML = ""; box.appendChild(img);
+  // Keep the video element in the DOM. Clearing box.innerHTML here would
+  // delete it, causing the later preview.style access to fail.
+  let img = $("selectedVideoImagePreview");
+  if (!img) {
+    img = document.createElement("img");
+    img.id = "selectedVideoImagePreview";
+    img.alt = "Selected image";
+    img.style.maxWidth = "100%";
+    img.style.maxHeight = "460px";
+    img.style.objectFit = "contain";
+    img.style.borderRadius = "9px";
+    $("videoPreviewBox").insertBefore(img, $("videoPreview"));
+  }
+  img.src = url;
+  img.style.display = "block";
+  $("videoPreview").style.display = "none";
+  const placeholder = $("videoPlaceholder");
+  if (placeholder) placeholder.style.display = "none";
   $("videoStatus").textContent = "Image ready. Press Create Video.";
   $("videoDownload").style.display = "none";
 });
@@ -248,7 +264,9 @@ $("videoGenerateBtn").addEventListener("click", async () => {
     }
     const url=URL.createObjectURL(output);
     preview.style.display="block"; preview.src=url; preview.load();
-    const box=$("videoPreviewBox"); const placeholder=$("videoPlaceholder"); if(placeholder) placeholder.style.display="none";
+    const selectedPreview = $("selectedVideoImagePreview");
+    if (selectedPreview) selectedPreview.style.display = "none";
+    const placeholder=$("videoPlaceholder"); if(placeholder) placeholder.style.display="none";
     link.href=url; link.download=filename; link.textContent=filename.endsWith(".mp4")?"Download MP4 Video":"Download Video (WebM)"; link.style.display="block";
   } catch(err) {
     status.textContent="Video creation failed: "+(err.message||err)+". Try a smaller image or a newer version of Chrome.";
