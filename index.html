@@ -5,15 +5,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0b1020">
-<meta name="description" content="Create AI images with Zvarik AI. Choose your image style, size, and prompt.">
-<title>Zvarik AI - AI Image Generator</title>
+<meta name="description" content="Create AI images and motion videos with Zvarik AI.">
+<title>Zvarik AI - Image & Video Studio</title>
+
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#0b1020;color:#fff;font-family:Arial,sans-serif}
 header{padding:20px 7%;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #252d43}
 .logo{font-size:25px;font-weight:bold;color:#a78bfa}
 .tag{color:#b9c2d9;font-size:13px}
-main{max-width:850px;margin:45px auto;padding:20px}
+main{max-width:850px;margin:35px auto;padding:20px}
 .hero{text-align:center}
 h1{font-size:clamp(34px,6vw,54px);margin:16px 0}
 h1 span{color:#a78bfa}
@@ -26,30 +27,36 @@ select{cursor:pointer}
 button{width:100%;padding:15px;margin-top:18px;border:0;border-radius:10px;background:#8b5cf6;color:white;font-size:16px;font-weight:bold;cursor:pointer}
 button:hover{background:#7544e8}
 button:disabled{opacity:.6;cursor:wait}
-#message{display:none;margin-top:18px;padding:13px;background:#202944;border-radius:10px;line-height:1.6;overflow-wrap:anywhere}
+#message,#videoStatus{display:none;margin-top:18px;padding:13px;background:#202944;border-radius:10px;line-height:1.6;overflow-wrap:anywhere}
 #resultImage{display:none;width:100%;height:auto;margin-top:16px;border-radius:12px}
 .download{display:none;text-align:center;margin-top:15px;padding:14px;border-radius:10px;background:#8b5cf6;color:white;text-decoration:none;font-weight:bold}
 .small{font-size:12px;color:#8d9ab7}
 .features{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:28px}
 .tile{background:#151c30;border:1px solid #303954;border-radius:12px;padding:20px 8px;text-align:center;color:#d5ccff}
 footer{text-align:center;padding:30px;color:#7f8ba8;font-size:13px}
-@media(max-width:550px){main{margin:20px auto}.features{grid-template-columns:1fr}header{padding:18px}.tag{font-size:11px}}
-
 .studio-tabs{display:flex;gap:10px;max-width:850px;margin:24px auto 0;padding:0 20px}
 .studio-tabs button{margin:0;flex:1}
 .studio-tabs button.active{background:#6d45d6}
 .studio-section{max-width:850px;margin:24px auto;padding:20px}
-.studio-section[hidden]{display:none}
-.upload-box{border:2px dashed #596381;border-radius:14px;padding:25px;text-align:center;margin-top:10px}
+.studio-section[hidden],main[hidden]{display:none}
+.upload-box{border:2px dashed #596381;border-radius:14px;padding:20px;text-align:center;margin-top:10px}
 .upload-box input{width:100%;margin-top:12px;color:#cbd5e1}
 #videoImagePreview{display:none;width:100%;max-height:400px;object-fit:contain;border-radius:12px;margin-top:16px}
-#videoStatus{display:none;background:#202944;padding:14px;border-radius:10px;margin-top:15px;overflow-wrap:anywhere}
+#videoDownload{display:none;color:#8bffcb;font-weight:bold;margin-top:18px;overflow-wrap:anywhere}
+@media(max-width:550px){
+ main{margin:20px auto}
+ .features{grid-template-columns:1fr}
+ header{padding:18px}
+ .tag{font-size:11px}
+ .studio-section{padding:12px}
+}
 </style>
 </head>
+
 <body>
 <header>
   <div class="logo">✦ Zvarik AI</div>
-  <div class="tag">AI Image Studio</div>
+  <div class="tag">Image & Video Studio</div>
 </header>
 
 <div class="studio-tabs">
@@ -57,7 +64,7 @@ footer{text-align:center;padding:30px;color:#7f8ba8;font-size:13px}
   <button type="button" id="videoTab">Video Studio</button>
 </div>
 
-<main>
+<main id="imageStudio">
   <section class="hero">
     <p>YOUR IMAGINATION, YOUR CREATION</p>
     <h1>Create Amazing Images with <span>AI</span></h1>
@@ -101,7 +108,7 @@ footer{text-align:center;padding:30px;color:#7f8ba8;font-size:13px}
     <div id="message" role="status" aria-live="polite"></div>
     <img id="resultImage" alt="Your AI-generated image">
     <a id="downloadBtn" class="download" download="zvarik-ai-image.jpg">Download Image</a>
-    <p class="small">Image generation may take a little time. Availability depends on the AI service and its usage limits.</p>
+    <p class="small">Image generation depends on AI service availability and usage limits.</p>
   </section>
 
   <h2 style="text-align:center;margin-top:36px">Explore Your Creativity</h2>
@@ -114,19 +121,18 @@ footer{text-align:center;padding:30px;color:#7f8ba8;font-size:13px}
 
 <section id="videoStudio" class="studio-section" hidden>
   <div class="panel">
-    <h2>✦ AI Video Studio</h2>
-    <p>Upload an image and describe how you want the scene to move.</p>
+    <h2>✦ Video Studio</h2>
+    <p>Animate an image with free browser-based camera motion effects.</p>
 
     <label for="videoImage">Upload your image</label>
     <div class="upload-box">
-      <p>Select an image from your computer</p>
+      <p>Select a JPG, PNG, or WebP image</p>
       <input type="file" id="videoImage" accept="image/png,image/jpeg,image/webp">
       <img id="videoImagePreview" alt="Selected image preview">
     </div>
 
-    <label for="videoPrompt">Describe your video scene</label>
-    <textarea id="videoPrompt" maxlength="1500"
-      placeholder="Example: The man walks forward slowly, wind moves his clothes, and the camera follows him cinematically."></textarea>
+    <label for="videoPrompt">Describe your scene</label>
+    <textarea id="videoPrompt" maxlength="1500" placeholder="Example: A cinematic scene with a slow camera zoom. Note: this prompt is saved as a description; it does not control AI-generated character movement."></textarea>
 
     <label for="videoDuration">Video duration</label>
     <select id="videoDuration">
@@ -135,17 +141,31 @@ footer{text-align:center;padding:30px;color:#7f8ba8;font-size:13px}
       <option value="10">10 seconds</option>
     </select>
 
-    <button type="button" id="videoGenerateBtn">✦ Generate Video</button>
+    <label for="motionStyle">Motion effect</label>
+    <select id="motionStyle">
+      <option value="zoom">Cinematic Zoom In</option>
+      <option value="zoomout">Slow Zoom Out</option>
+      <option value="panleft">Move Left</option>
+      <option value="panright">Move Right</option>
+      <option value="cinematic">Cinematic Pan + Zoom</option>
+    </select>
 
-    <div id="videoStatus" role="status" aria-live="polite">
-      Video generation is not connected yet.
-    </div>
+    <button type="button" id="videoGenerateBtn">✦ Create MP4 Video</button>
+    <div id="videoStatus" role="status" aria-live="polite"></div>
+    <a id="videoDownload" download="zvarik-ai-video.mp4">⬇ Download MP4 Video</a>
+
+    <p class="small">The first conversion may take time because the browser needs to load the video converter. Keep this tab open.</p>
   </div>
 </section>
 
 <footer>© 2026 Zvarik AI · Imagine. Create. Inspire.</footer>
 
+<!-- FFmpeg browser libraries for MP4 conversion -->
+<script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js"></script>
+<script src="https://unpkg.com/@ffmpeg/util@0.12.1/dist/umd/index.js"></script>
+
 <script>
+/* IMAGE STUDIO - existing image generation API */
 const generateBtn = document.getElementById("generateBtn");
 const promptInput = document.getElementById("prompt");
 const styleInput = document.getElementById("style");
@@ -210,21 +230,18 @@ async function generate() {
     downloadBtn.href = data.image;
 
   } catch (error) {
-    message.textContent = error.message ||
-      "Something went wrong. Please try again.";
+    message.textContent = error.message || "Something went wrong. Please try again.";
   } finally {
     generateBtn.disabled = false;
     generateBtn.textContent = "✦ Generate Image";
   }
 }
 
+/* STUDIO TABS */
 const imageTab = document.getElementById("imageTab");
 const videoTab = document.getElementById("videoTab");
-const imageStudio = document.querySelector("main");
+const imageStudio = document.getElementById("imageStudio");
 const videoStudio = document.getElementById("videoStudio");
-const videoImage = document.getElementById("videoImage");
-const videoImagePreview = document.getElementById("videoImagePreview");
-const videoStatus = document.getElementById("videoStatus");
 
 imageTab.addEventListener("click", () => {
   imageStudio.hidden = false;
@@ -240,53 +257,230 @@ videoTab.addEventListener("click", () => {
   videoTab.classList.add("active");
 });
 
+/* VIDEO STUDIO */
+const videoImage = document.getElementById("videoImage");
+const videoImagePreview = document.getElementById("videoImagePreview");
+const videoStatus = document.getElementById("videoStatus");
+const videoButton = document.getElementById("videoGenerateBtn");
+const videoDownload = document.getElementById("videoDownload");
+
+let previewURL = null;
+let downloadURL = null;
+
 videoImage.addEventListener("change", () => {
   const file = videoImage.files[0];
-
   videoImagePreview.style.display = "none";
+  videoDownload.style.display = "none";
 
   if (!file) return;
 
   if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
-    videoStatus.style.display = "block";
-    videoStatus.textContent = "Please select a JPG, PNG, or WebP image.";
+    showVideoStatus("Please select a JPG, PNG, or WebP image.");
     videoImage.value = "";
     return;
   }
 
   if (file.size > 10 * 1024 * 1024) {
-    videoStatus.style.display = "block";
-    videoStatus.textContent = "Please select an image smaller than 10 MB.";
+    showVideoStatus("Please select an image smaller than 10 MB.");
     videoImage.value = "";
     return;
   }
 
-  videoImagePreview.src = URL.createObjectURL(file);
+  if (previewURL) URL.revokeObjectURL(previewURL);
+  previewURL = URL.createObjectURL(file);
+  videoImagePreview.src = previewURL;
   videoImagePreview.style.display = "block";
-  videoStatus.style.display = "block";
-  videoStatus.textContent = "Image selected. Video generation still needs a compatible free AI service.";
+  showVideoStatus("Image selected. Choose a motion effect and create your video.");
 });
 
-document.getElementById("videoGenerateBtn").addEventListener("click", () => {
+function showVideoStatus(text) {
+  videoStatus.style.display = "block";
+  videoStatus.textContent = text;
+}
+
+videoButton.addEventListener("click", async () => {
   const file = videoImage.files[0];
   const prompt = document.getElementById("videoPrompt").value.trim();
+  const duration = Number(document.getElementById("videoDuration").value);
+  const motion = document.getElementById("motionStyle").value;
 
-  videoStatus.style.display = "block";
+  videoDownload.style.display = "none";
 
   if (!file) {
-    videoStatus.textContent = "Please upload an image first.";
+    showVideoStatus("Please upload an image first.");
     return;
   }
 
   if (!prompt) {
-    videoStatus.textContent = "Please describe the scene you want in your video.";
+    showVideoStatus("Please describe your scene first.");
     return;
   }
 
-  videoStatus.textContent =
-    "Your image and scene prompt are ready. The free video-generation service has not been connected yet.";
-});
+  if (!window.FFmpegWASM || !window.FFmpegUtil) {
+    showVideoStatus("The video converter library failed to load. Check your internet connection and refresh the page.");
+    return;
+  }
 
+  videoButton.disabled = true;
+  videoButton.textContent = "Creating video...";
+
+  let recorder = null;
+  let stream = null;
+  let animationFrame = null;
+  let ffmpeg = null;
+  let inputURL = null;
+
+  try {
+    showVideoStatus("Step 1/3: Preparing your image...");
+
+    const img = new Image();
+    inputURL = URL.createObjectURL(file);
+
+    await new Promise((resolve, reject) => {
+      img.onload = resolve;
+      img.onerror = () => reject(new Error("Could not load your image."));
+      img.src = inputURL;
+    });
+
+    const canvas = document.createElement("canvas");
+    canvas.width = 1280;
+    canvas.height = 720;
+    const ctx = canvas.getContext("2d");
+
+    if (!canvas.captureStream || !window.MediaRecorder) {
+      throw new Error("Your browser does not support recording. Try the latest desktop version of Chrome.");
+    }
+
+    stream = canvas.captureStream(30);
+
+    const mimeType = MediaRecorder.isTypeSupported("video/webm;codecs=vp9")
+      ? "video/webm;codecs=vp9"
+      : "video/webm";
+
+    recorder = new MediaRecorder(stream, {mimeType});
+    const chunks = [];
+
+    recorder.ondataavailable = event => {
+      if (event.data && event.data.size > 0) chunks.push(event.data);
+    };
+
+    const recordingDone = new Promise((resolve, reject) => {
+      recorder.onstop = () => resolve(new Blob(chunks, {type: "video/webm"}));
+      recorder.onerror = () => reject(new Error("Browser recording failed."));
+    });
+
+    const start = performance.now();
+
+    function drawFrame(now) {
+      const progress = Math.min((now - start) / (duration * 1000), 1);
+      const w = canvas.width;
+      const h = canvas.height;
+
+      let zoom = 1;
+      let moveX = 0;
+
+      if (motion === "zoom") zoom = 1 + progress * 0.20;
+      if (motion === "zoomout") zoom = 1.20 - progress * 0.20;
+      if (motion === "panleft") moveX = -progress * 100;
+      if (motion === "panright") moveX = progress * 100;
+      if (motion === "cinematic") {
+        zoom = 1 + progress * 0.12;
+        moveX = (progress - 0.5) * 70;
+      }
+
+      ctx.fillStyle = "#080b14";
+      ctx.fillRect(0, 0, w, h);
+
+      const scale = Math.max(w / img.width, h / img.height) * zoom;
+      const drawW = img.width * scale;
+      const drawH = img.height * scale;
+      const x = (w - drawW) / 2 + moveX;
+      const y = (h - drawH) / 2;
+
+      ctx.drawImage(img, x, y, drawW, drawH);
+
+      if (progress < 1) {
+        animationFrame = requestAnimationFrame(drawFrame);
+      } else {
+        setTimeout(() => {
+          if (recorder && recorder.state !== "inactive") recorder.stop();
+        }, 200);
+      }
+    }
+
+    recorder.start();
+    animationFrame = requestAnimationFrame(drawFrame);
+    showVideoStatus("Step 2/3: Recording motion effect...");
+
+    const webmBlob = await recordingDone;
+
+    if (animationFrame) cancelAnimationFrame(animationFrame);
+    stream.getTracks().forEach(track => track.stop());
+
+    showVideoStatus("Step 3/3: Loading converter and converting to MP4. Please wait...");
+
+    ffmpeg = new window.FFmpegWASM.FFmpeg();
+
+    ffmpeg.on("progress", ({progress}) => {
+      const percent = Math.max(0, Math.min(100, Math.round(progress * 100)));
+      showVideoStatus("Converting video to MP4: " + percent + "%");
+    });
+
+    const {toBlobURL} = window.FFmpegUtil;
+    const baseURL = "https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd";
+
+    await ffmpeg.load({
+      coreURL: await toBlobURL(baseURL + "/ffmpeg-core.js", "text/javascript"),
+      wasmURL: await toBlobURL(baseURL + "/ffmpeg-core.wasm", "application/wasm")
+    });
+
+    await ffmpeg.writeFile(
+      "input.webm",
+      new Uint8Array(await webmBlob.arrayBuffer())
+    );
+
+    await ffmpeg.exec([
+      "-i", "input.webm",
+      "-c:v", "libx264",
+      "-preset", "ultrafast",
+      "-pix_fmt", "yuv420p",
+      "-movflags", "+faststart",
+      "-an",
+      "output.mp4"
+    ]);
+
+    const output = await ffmpeg.readFile("output.mp4");
+    const mp4Blob = new Blob([output], {type: "video/mp4"});
+
+    if (downloadURL) URL.revokeObjectURL(downloadURL);
+    downloadURL = URL.createObjectURL(mp4Blob);
+
+    videoDownload.href = downloadURL;
+    videoDownload.style.display = "block";
+    showVideoStatus("Your MP4 video is ready. Click the download link below.");
+
+    await ffmpeg.deleteFile("input.webm");
+    await ffmpeg.deleteFile("output.mp4");
+
+  } catch (error) {
+    console.error("Zvarik video error:", error);
+    showVideoStatus(
+      "Video creation failed: " +
+      (error.message || "Unknown error") +
+      ". Refresh the page and try again. If the converter fails to load, the CDN may be unavailable."
+    );
+  } finally {
+    if (recorder && recorder.state !== "inactive") {
+      try { recorder.stop(); } catch (e) {}
+    }
+    if (stream) stream.getTracks().forEach(track => track.stop());
+    if (animationFrame) cancelAnimationFrame(animationFrame);
+    if (inputURL) URL.revokeObjectURL(inputURL);
+
+    videoButton.disabled = false;
+    videoButton.textContent = "✦ Create MP4 Video";
+  }
+});
 </script>
 </body>
 </html>
