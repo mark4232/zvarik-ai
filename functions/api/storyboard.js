@@ -2,9 +2,11 @@
 // Turns a short idea (Urdu / Hindi / Roman Urdu / English) into a full storyboard:
 // characters, scenes, spoken lines, emotion, camera movement and camera angle.
 
+// Note: @cf/meta/llama-3.1-8b-instruct was deprecated by Cloudflare (error 5028).
 const MODELS = [
   "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-  "@cf/meta/llama-3.1-8b-instruct"
+  "@cf/meta/llama-4-scout-17b-16e-instruct",
+  "@cf/mistral/mistral-small-3.1-24b-instruct"
 ];
 
 const EMOTIONS = ["sad", "happy", "angry", "fear", "excited", "calm", "serious", "surprised", "loving", "neutral"];
@@ -52,7 +54,7 @@ function pick(v, list, fallback) {
 }
 
 function extractJSON(res) {
-  let raw = res && (res.response ?? res.result ?? "");
+  let raw = res && (res.response ?? res.result ?? res.choices?.[0]?.message?.content ?? res.choices?.[0]?.text ?? "");
   if (raw && typeof raw === "object") return raw;
   raw = String(raw).replace(/```json|```/gi, "").trim();
   const start = raw.indexOf("{");
@@ -106,7 +108,7 @@ export async function onRequestPost({ request, env }) {
 
     const userMsg = `Number of scenes: ${n}\n${langNote}\nVideo idea: ${prompt}`;
 
-    let lastError = null;
+    const errors = [];
     for (const model of MODELS) {
       for (let attempt = 0; attempt < 2; attempt++) {
         try {
@@ -115,18 +117,22 @@ export async function onRequestPost({ request, env }) {
               { role: "system", content: SYSTEM },
               { role: "user", content: userMsg }
             ],
-            max_tokens: 4000,
+            max_tokens: 3500,
             temperature: attempt === 0 ? 0.7 : 0.4
           });
           const storyboard = normalize(extractJSON(res), n, langPref);
           return Response.json({ storyboard, model });
         } catch (err) {
-          lastError = err;
-          console.warn(`Storyboard ${model} attempt ${attempt + 1} failed:`, err?.message || err);
+          const msg = String(err?.message || err).slice(0, 160);
+          errors.push(`${model.split("/").pop()}: ${msg}`);
+          console.warn(`Storyboard ${model} attempt ${attempt + 1} failed:`, msg);
+          // Model band/missing hai to dobara try karne ka faida nahi, agle model par jao
+          if (/deprecat|not found|no such model|5028|5007/i.test(msg)) break;
         }
       }
     }
-    throw lastError || new Error("Could not create the storyboard.");
+    // Asli wajah user ko dikhao taake debug ho sake
+    throw new Error("Storyboard failed. " + errors.slice(-3).join(" | "));
   } catch (error) {
     console.error("Storyboard error:", error);
     return Response.json({ error: error?.message || "Storyboard failed." }, { status: 500 });
