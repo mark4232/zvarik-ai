@@ -82,6 +82,9 @@ footer{text-align:center;padding:18px;color:#7186a2;font-size:12px}
               <select id="size"><option value="square">Square</option><option value="portrait">Portrait (9:16)</option><option value="landscape">Landscape (16:9)</option></select>
             </div>
           </div>
+          <div class="field"><label for="quality">Image quality</label>
+            <select id="quality"><option value="fast">Fast (cheap, saves your free daily limit)</option><option value="high">High quality (uses a lot of free limit)</option></select>
+          </div>
           <button id="generateBtn" type="button">Generate Image</button>
           <div id="imageStatus" class="status" role="status"></div>
           <a id="imageDownload" class="download" download="zvarik-ai-image.png">Download Image</a>
@@ -120,6 +123,9 @@ footer{text-align:center;padding:18px;color:#7186a2;font-size:12px}
             <div class="field"><label for="vShape">Video shape</label>
               <select id="vShape"><option value="landscape">Landscape 16:9</option><option value="portrait">Portrait 9:16</option></select>
             </div>
+          </div>
+          <div class="field"><label for="vQuality">Image quality</label>
+            <select id="vQuality"><option value="fast">Fast (cheap, saves your free daily limit)</option><option value="high">High quality (uses a lot of free limit)</option></select>
           </div>
           <label class="check"><input type="checkbox" id="vVoice" checked> Add emotional voice</label>
           <label class="check"><input type="checkbox" id="vCaptions" checked> Show subtitles</label>
@@ -187,7 +193,7 @@ $("generateBtn").addEventListener("click", async () => {
   if (!prompt) { status.textContent = "Please enter an image prompt first."; $("prompt").focus(); return; }
   button.disabled = true; button.textContent = "Generating..."; status.textContent = "Generating image. Please wait..."; download.style.display = "none";
   try {
-    const imageURL = await requestImage({prompt, style:$("style").value, size:$("size").value});
+    const imageURL = await requestImage({prompt, style:$("style").value, size:$("size").value, quality:$("quality").value});
     preview.innerHTML = "";
     const img = document.createElement("img"); img.alt = prompt; img.src = imageURL; preview.appendChild(img);
     download.href = imageURL; download.download = "zvarik-ai-image.png"; download.style.display = "block";
@@ -296,14 +302,14 @@ function loadImage(src) {
     img.src = src;
   });
 }
-async function getSceneImage(sc, style, shape) {
+async function getSceneImage(sc, style, shape, quality) {
   const prompt = sceneImagePrompt(sc);
-  const key = [prompt, style, shape].join("|");
+  const key = [prompt, style, shape, quality].join("|");
   if (sc._img && sc._imgKey === key) return sc._img;
   let lastErr;
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
-      const url = await requestImage({prompt, style, size: shape, skipEnhance: true});
+      const url = await requestImage({prompt, style, size: shape, skipEnhance: true, quality});
       sc._img = await loadImage(url); sc._imgKey = key; sc._imgUrl = url;
       return sc._img;
     } catch (e) { lastErr = e; await sleep(1500 * (attempt + 1)); }
@@ -504,7 +510,7 @@ $("createBtn").addEventListener("click", async () => {
       const sc = scenes[i], stat = $("sstat" + i);
       stat.textContent = "Making image...";
       setVStatus(`Scene ${i + 1} of ${scenes.length}: creating image...`);
-      await getSceneImage(sc, style, shape);
+      await getSceneImage(sc, style, shape, $("vQuality").value);
       const thumb = $("thumb" + i); thumb.src = sc._imgUrl || thumb.src; thumb.style.display = "block"; $("thumbEmpty" + i).style.display = "none";
       setBar((++done / steps) * 100);
 
