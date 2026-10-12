@@ -157,7 +157,8 @@ export async function onRequestPost({ request, env }) {
     const size = SIZES[body.size] || SIZES.square;
 
     // 1) Prompt ko English + detailed banao
-    const enhanced = await enhancePrompt(env, userPrompt);
+    // Video Studio already sends a finished English prompt, so it can skip the enhancer.
+    const enhanced = body.skipEnhance ? userPrompt : await enhancePrompt(env, userPrompt);
 
     // 2) Subject sab se pehle, phir style, composition, quality
     const fullPrompt = `${enhanced}. Style: ${styleText}. ${size.text}. ${QUALITY_TAIL}`;
