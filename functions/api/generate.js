@@ -106,7 +106,46 @@ function readText(res) {
   return (typeof t === "string" ? t : JSON.stringify(t)).trim();
 }
 
+function cleanEnhanced(text) {
+  text = String(text || "").trim().replace(/^["'`\s]+|["'`\s]+$/g, "");
+  text = text.replace(/^(prompt|image prompt|final prompt)\s*:\s*/i, "");
+  return text.length >= 15 && text.length <= 1500 ? text : null;
+}
+
+// Gemini does not use Cloudflare's free neurons, so it is tried first.
+async function enhanceWithGemini(env, userPrompt) {
+  const models = [env.GEMINI_TEXT_MODEL, "gemini-3.5-flash-lite"].filter(Boolean);
+  for (const m of models) {
+    try {
+      const res = await Promise.race([
+        fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "x-goog-api-key": env.GEMINI_API_KEY },
+          body: JSON.stringify({
+            systemInstruction: { parts: [{ text: ENHANCER_SYSTEM }] },
+            contents: [{ role: "user", parts: [{ text: userPrompt }] }],
+            generationConfig: { temperature: 0.4, maxOutputTokens: 1000 }
+          })
+        }),
+        new Promise((_, rej) => setTimeout(() => rej(new Error("gemini timeout")), 20000))
+      ]);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data?.error?.message || `HTTP ${res.status}`);
+      const text = cleanEnhanced((data?.candidates?.[0]?.content?.parts || []).map((p) => p.text || "").join(""));
+      if (text) return text;
+    } catch (e) {
+      console.warn(`Gemini enhancer ${m} failed:`, e?.message || e);
+    }
+  }
+  return null;
+}
+
 async function enhancePrompt(env, userPrompt) {
+  if (env.GEMINI_API_KEY) {
+    const g = await enhanceWithGemini(env, userPrompt);
+    if (g) return g;
+  }
+  if (!env.AI) return userPrompt;
   for (const model of ENHANCER_MODELS) {
     try {
       const res = await Promise.race([
@@ -158,6 +197,7 @@ export async function onRequestPost({ request, env }) {
     if (!env.AI) {
       return json({ error: "AI binding missing. Check Cloudflare Settings > Bindings." }, 500);
     }
+    // (Image models always need the AI binding; only the text helper can use Gemini instead.)
 
     const body = await request.json().catch(() => ({}));
     const userPrompt = typeof body.prompt === "string" ? body.prompt.trim() : "";
@@ -174,9 +214,13 @@ export async function onRequestPost({ request, env }) {
     // 2) Subject sab se pehle, phir style, composition, quality
     const fullPrompt = `${enhanced}. Style: ${styleText}. ${size.text}. ${QUALITY_TAIL}`;
 
-    // 3) Models ko order me try karo
+    // 3) Models ko order me try karo.
+    // "fast" (default) = FLUX schnell, bohat sasta, free daily limit bachata hai.
+    // "high" = Phoenix/Lucid, behtar quality lekin ek image me hazaron neurons lagte hain.
+    const high = body.quality === "high";
+    const models = high ? IMAGE_MODELS : IMAGE_MODELS.filter((m) => m.type === "flux");
     let lastError = null;
-    for (const model of IMAGE_MODELS) {
+    for (const model of models) {
       try {
         const b64 = await runModel(env, model, fullPrompt, size);
         return json({
@@ -193,6 +237,10 @@ export async function onRequestPost({ request, env }) {
     throw lastError || new Error("All image models failed.");
   } catch (error) {
     console.error("Zvarik AI generation error:", error);
-    return json({ error: error?.message || "Unknown error while generating image." }, 500);
+    let message = error?.message || "Unknown error while generating image.";
+    if (/4006|daily free allocation/i.test(message)) {
+      message = "Cloudflare ki aaj ki free limit (10,000 neurons) khatam ho gayi hai. Wo Pakistan time subah 5 baje reset hoti hai, ya Workers Paid plan lein.";
+    }
+    return json({ error: message }, 500);
   }
 }
