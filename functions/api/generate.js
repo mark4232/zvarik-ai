@@ -2,7 +2,11 @@
 // Upgrade: Urdu/Roman Urdu/Hindi prompt -> English detailed prompt (LLM),
 // better image model with fallback, proper sizes, quality boosters.
 
-const ENHANCER_MODEL = "@cf/meta/llama-3.1-8b-instruct";
+// Note: @cf/meta/llama-3.1-8b-instruct was deprecated by Cloudflare (error 5028).
+const ENHANCER_MODELS = [
+  "@cf/meta/llama-3.1-8b-instruct-fp8",
+  "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
+];
 
 // Pehle model best quality / prompt-following ke liye, baad wale fallback hain.
 // Agar koi model aapke account me na chale to wo khud skip ho jayega.
@@ -96,29 +100,36 @@ function mimeFromBase64(b64) {
   return "image/jpeg";
 }
 
+function readText(res) {
+  if (!res) return "";
+  const t = res.response ?? res.result ?? res.choices?.[0]?.message?.content ?? res.choices?.[0]?.text ?? "";
+  return (typeof t === "string" ? t : JSON.stringify(t)).trim();
+}
+
 async function enhancePrompt(env, userPrompt) {
-  try {
-    const res = await Promise.race([
-      env.AI.run(ENHANCER_MODEL, {
-        messages: [
-          { role: "system", content: ENHANCER_SYSTEM },
-          { role: "user", content: userPrompt }
-        ],
-        max_tokens: 280,
-        temperature: 0.4
-      }),
-      new Promise((_, rej) => setTimeout(() => rej(new Error("enhancer timeout")), 15000))
-    ]);
-    let text = (res && (res.response || res.result || "")).toString().trim();
-    text = text.replace(/^["'`\s]+|["'`\s]+$/g, "");
-    // Agar model ne extra label likh diya ho to hata do
-    text = text.replace(/^(prompt|image prompt|final prompt)\s*:\s*/i, "");
-    if (text.length < 15 || text.length > 1500) return userPrompt;
-    return text;
-  } catch (e) {
-    console.warn("Prompt enhancer failed, using original prompt:", e?.message || e);
-    return userPrompt;
+  for (const model of ENHANCER_MODELS) {
+    try {
+      const res = await Promise.race([
+        env.AI.run(model, {
+          messages: [
+            { role: "system", content: ENHANCER_SYSTEM },
+            { role: "user", content: userPrompt }
+          ],
+          max_tokens: 280,
+          temperature: 0.4
+        }),
+        new Promise((_, rej) => setTimeout(() => rej(new Error("enhancer timeout")), 20000))
+      ]);
+      let text = readText(res);
+      text = text.replace(/^["'`\s]+|["'`\s]+$/g, "");
+      // Agar model ne extra label likh diya ho to hata do
+      text = text.replace(/^(prompt|image prompt|final prompt)\s*:\s*/i, "");
+      if (text.length >= 15 && text.length <= 1500) return text;
+    } catch (e) {
+      console.warn(`Prompt enhancer ${model} failed:`, e?.message || e);
+    }
   }
+  return userPrompt; // sab fail ho jayen to original prompt use hoga
 }
 
 async function runModel(env, model, fullPrompt, size) {
