@@ -2,12 +2,42 @@
 // Turns a short idea (Urdu / Hindi / Roman Urdu / English) into a full storyboard:
 // characters, scenes, spoken lines, emotion, camera movement and camera angle.
 
+// Main brain: Gemini (does NOT use Cloudflare's free neurons). Needs GEMINI_API_KEY.
+// Optional: GEMINI_TEXT_MODEL to override the model name.
+const GEMINI_MODELS = ["gemini-3.5-flash-lite", "gemini-3.8-flash"];
+
+// Backup brain: Cloudflare Workers AI (uses the daily free neurons).
 // Note: @cf/meta/llama-3.1-8b-instruct was deprecated by Cloudflare (error 5028).
 const MODELS = [
   "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-  "@cf/meta/llama-4-scout-17b-16e-instruct",
-  "@cf/mistral/mistral-small-3.1-24b-instruct"
+  "@cf/meta/llama-3.1-8b-instruct-fp8"
 ];
+
+async function geminiStoryboard(env, system, user) {
+  const models = [env.GEMINI_TEXT_MODEL, ...GEMINI_MODELS].filter(Boolean);
+  let last = null;
+  for (const m of models) {
+    try {
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-goog-api-key": env.GEMINI_API_KEY },
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: system }] },
+          contents: [{ role: "user", parts: [{ text: user }] }],
+          generationConfig: { temperature: 0.7, responseMimeType: "application/json", maxOutputTokens: 8000 }
+        })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data?.error?.message || `HTTP ${res.status}`);
+      const text = (data?.candidates?.[0]?.content?.parts || []).map((p) => p.text || "").join("");
+      if (!text.trim()) throw new Error("empty answer");
+      return { response: text, model: m };
+    } catch (e) {
+      last = new Error(`${m}: ${String(e?.message || e).slice(0, 140)}`);
+    }
+  }
+  throw last || new Error("Gemini failed");
+}
 
 const EMOTIONS = ["sad", "happy", "angry", "fear", "excited", "calm", "serious", "surprised", "loving", "neutral"];
 const SHOTS = ["extreme_close_up", "close_up", "medium", "wide"];
@@ -92,7 +122,7 @@ function normalize(sb, n, langPref) {
 
 export async function onRequestPost({ request, env }) {
   try {
-    if (!env.AI) return Response.json({ error: "AI binding missing." }, { status: 500 });
+    if (!env.AI && !env.GEMINI_API_KEY) return Response.json({ error: "No AI available. Add GEMINI_API_KEY or the AI binding." }, { status: 500 });
 
     const body = await request.json().catch(() => ({}));
     const prompt = typeof body.prompt === "string" ? body.prompt.trim() : "";
@@ -109,7 +139,22 @@ export async function onRequestPost({ request, env }) {
     const userMsg = `Number of scenes: ${n}\n${langNote}\nVideo idea: ${prompt}`;
 
     const errors = [];
-    for (const model of MODELS) {
+
+    // 1) Gemini first (free-neuron safe)
+    if (env.GEMINI_API_KEY) {
+      for (let attempt = 0; attempt < 2; attempt++) {
+        try {
+          const res = await geminiStoryboard(env, SYSTEM, userMsg);
+          const storyboard = normalize(extractJSON(res), n, langPref);
+          return Response.json({ storyboard, model: res.model });
+        } catch (err) {
+          errors.push(String(err?.message || err).slice(0, 200));
+        }
+      }
+    }
+
+    // 2) Cloudflare Workers AI as backup
+    for (const model of env.AI ? MODELS : []) {
       for (let attempt = 0; attempt < 2; attempt++) {
         try {
           const res = await env.AI.run(model, {
@@ -135,6 +180,10 @@ export async function onRequestPost({ request, env }) {
     throw new Error("Storyboard failed. " + errors.slice(-3).join(" | "));
   } catch (error) {
     console.error("Storyboard error:", error);
-    return Response.json({ error: error?.message || "Storyboard failed." }, { status: 500 });
+    let message = error?.message || "Storyboard failed.";
+    if (/4006|daily free allocation/i.test(message)) {
+      message += " (Cloudflare ki aaj ki free limit khatam hai, wo Pakistan time subah 5 baje reset hoti hai. Behtar hal: GEMINI_API_KEY lagayen.)";
+    }
+    return Response.json({ error: message }, { status: 500 });
   }
 }
