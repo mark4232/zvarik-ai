@@ -56,30 +56,37 @@ export async function onRequestPost({ request, env }) {
 
     const voice = VOICES.includes(body.voice) ? body.voice : "Charon";
     const style = EMOTION_STYLE[body.emotion] || EMOTION_STYLE.neutral;
-    const model = env.GEMINI_TTS_MODEL || "gemini-2.5-flash-preview-tts";
+    // Models are tried in order; if one is unavailable or rate limited, the next one is used.
+    const models = [env.GEMINI_TTS_MODEL, "gemini-3.8-flash-tts", "gemini-3.8-flash-lite-tts", "gemini-2.5-flash-preview-tts"]
+      .filter((m, i, a) => m && a.indexOf(m) === i);
 
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "x-goog-api-key": env.GEMINI_API_KEY },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: `Say ${style}: ${text}` }] }],
-          generationConfig: {
-            responseModalities: ["AUDIO"],
-            speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: voice } } }
-          }
-        })
+    let data = null, lastStatus = 502, lastMsg = "", part = null;
+    for (const model of models) {
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "x-goog-api-key": env.GEMINI_API_KEY },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: `Say ${style}: ${text}` }] }],
+            generationConfig: {
+              responseModalities: ["AUDIO"],
+              speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: voice } } }
+            }
+          })
+        }
+      );
+      data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        lastStatus = res.status === 429 ? 429 : 502;
+        lastMsg = `${model}: ${data?.error?.message || res.status}`;
+        continue;
       }
-    );
-
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) {
-      return err(data?.error?.message || `Gemini TTS failed (${res.status}).`, res.status === 429 ? 429 : 502);
+      part = data?.candidates?.[0]?.content?.parts?.find((p) => p.inlineData);
+      if (part) break;
+      lastStatus = 502; lastMsg = `${model}: no audio returned`;
     }
-
-    const part = data?.candidates?.[0]?.content?.parts?.find((p) => p.inlineData);
-    if (!part) return err("Gemini returned no audio. Please try again.", 502);
+    if (!part) return err(`Gemini TTS failed. ${lastMsg}`.slice(0, 300), lastStatus);
 
     const rate = parseInt(/rate=(\d+)/.exec(part.inlineData.mimeType || "")?.[1] || "24000", 10);
     const wav = pcmToWav(b64ToBytes(part.inlineData.data), rate);
