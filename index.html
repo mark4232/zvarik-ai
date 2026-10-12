@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Zvarik AI — Image & Video Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@700&family=Noto+Sans+Devanagari:wght@700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#07111f;--panel:#101e31;--panel2:#0c1828;--line:#263850;--text:#edf4ff;--muted:#9aacc4;--blue:#4d8dff;--cyan:#45e0d0;--pink:#a879ff}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 15% 0%,#142b4a 0,transparent 35%),var(--bg);color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif;min-height:100vh}
@@ -12,31 +14,46 @@ header{padding:28px 18px 20px;text-align:center;border-bottom:1px solid #1d3048;
 header p{color:var(--muted);margin:9px 0 0;font-size:14px}
 main{max-width:1120px;margin:26px auto;padding:0 16px 50px}
 .tabs{display:flex;gap:10px;justify-content:center;margin:0 auto 22px;flex-wrap:wrap}
-.tab{border:1px solid var(--line);background:var(--panel2);color:var(--muted);padding:12px 22px;border-radius:12px;cursor:pointer;font-size:14px;font-weight:700}
+.tab{border:1px solid var(--line);background:var(--panel2);color:var(--muted);padding:12px 22px;border-radius:12px;cursor:pointer;font-size:14px;font-weight:700;width:auto}
 .tab.active{background:linear-gradient(120deg,#244f9c,#176e7b);border-color:#4389d0;color:white}
 .panel{display:none}.panel.active{display:block}
 .card{background:linear-gradient(145deg,#122238,#0c192a);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 16px 40px #0002}
 h1{font-size:25px;margin:0 0 7px} .sub{color:var(--muted);margin:0 0 22px;line-height:1.5;font-size:14px}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.field{margin-bottom:17px}label{display:block;font-size:13px;font-weight:700;margin:0 0 8px;color:#d8e5f7}
-textarea,select,input[type=file]{width:100%;background:#081524;border:1px solid #2b405b;color:var(--text);border-radius:11px;padding:12px;font:inherit;outline:none}
-textarea{resize:vertical;min-height:135px;line-height:1.5}textarea:focus,select:focus{border-color:var(--blue)}select{height:44px}
+textarea,select,input[type=file],input[type=text]{width:100%;background:#081524;border:1px solid #2b405b;color:var(--text);border-radius:11px;padding:12px;font:inherit;outline:none}
+textarea{resize:vertical;min-height:135px;line-height:1.5}textarea:focus,select:focus,input[type=text]:focus{border-color:var(--blue)}select{height:44px}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.counter{font-size:12px;color:var(--muted);text-align:right;margin-top:5px}
 button{border:0;border-radius:11px;padding:13px 17px;font-size:14px;font-weight:800;cursor:pointer;color:#061323;background:linear-gradient(110deg,var(--cyan),#73a9ff);width:100%;transition:filter .15s}
 button:hover{filter:brightness(1.08)}button:disabled{opacity:.55;cursor:wait}
+button.ghost{background:#0c1828;color:#cfe0f6;border:1px solid #35506f}
 .preview{min-height:300px;border:1px dashed #35506f;border-radius:14px;background:#081524;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;padding:12px}
 .preview img{max-width:100%;max-height:460px;object-fit:contain;border-radius:9px}.placeholder{text-align:center;color:var(--muted);padding:20px;line-height:1.6}.placeholder .emoji{font-size:40px;display:block;margin-bottom:10px}
 .status{margin-top:12px;min-height:22px;color:var(--muted);font-size:13px;line-height:1.5;overflow-wrap:anywhere}
 .download{display:none;margin-top:12px;text-decoration:none;text-align:center;padding:12px;border:1px solid #3b6e77;color:#8df4dc;border-radius:10px;font-weight:700}
 .smallnote{font-size:12px;color:var(--muted);line-height:1.6;margin-top:12px}
-.videoPreview{width:100%;max-height:460px;border-radius:10px;display:none;background:#000}
+.videoPreview,.vCanvas{width:100%;max-height:520px;border-radius:10px;display:none;background:#000;object-fit:contain}
+.check{display:flex;align-items:center;gap:8px;font-size:13px;color:#d8e5f7;margin:0 0 10px;font-weight:600}.check input{width:auto}
+.bar{height:8px;background:#081524;border:1px solid #2b405b;border-radius:99px;overflow:hidden;margin-top:12px;display:none}.bar>div{height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--blue));transition:width .25s}
+.scenes{margin-top:22px;display:none}.scenes h2{font-size:18px;margin:0 0 12px}
+.scene{border:1px solid var(--line);border-radius:14px;background:#0a1626;padding:14px;margin-bottom:14px}
+.sceneHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:14px}.sstat{font-size:12px;color:var(--muted)}
+.sceneBody{display:grid;grid-template-columns:200px 1fr;gap:14px}
+.thumb{width:100%;border-radius:10px;border:1px solid #2b405b;background:#081524;aspect-ratio:16/9;object-fit:cover}
+.thumbBox{display:flex;flex-direction:column;gap:8px}
+.thumbEmpty{aspect-ratio:16/9;border:1px dashed #35506f;border-radius:10px;display:grid;place-items:center;color:#6f86a4;font-size:12px}
+.row4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px}
+.scene label{font-size:12px;margin-bottom:5px}.scene select{height:40px;padding:6px 10px}.scene textarea{min-height:64px}
+.scene .field{margin-bottom:10px}
+.mini{padding:8px 10px;font-size:12px}
+details summary{cursor:pointer;color:var(--muted);font-size:12px;margin-bottom:8px}
 footer{text-align:center;padding:18px;color:#7186a2;font-size:12px}
-@media(max-width:760px){.grid{grid-template-columns:1fr}.card{padding:16px}h1{font-size:22px}.preview{min-height:220px}}
+@media(max-width:760px){.grid{grid-template-columns:1fr}.card{padding:16px}h1{font-size:22px}.preview{min-height:220px}.sceneBody{grid-template-columns:1fr}.row4{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
 <header>
   <div class="logo"><span class="logoMark">Z</span><span>Zvarik AI Studio</span></div>
-  <p>Create AI images and turn pictures into short motion videos.</p>
+  <p>Create AI images and turn your story idea into a narrated video with cinematic camera moves.</p>
 </header>
 <main>
   <div class="tabs">
@@ -47,7 +64,7 @@ footer{text-align:center;padding:18px;color:#7186a2;font-size:12px}
   <section id="imagePanel" class="panel active">
     <div class="card">
       <h1>AI Image Generator</h1>
-      <p class="sub">Describe the image you want. Keep the prompt clear and specific for best results.</p>
+      <p class="sub">Describe the image you want. Urdu, Hindi, Roman Urdu or English all work.</p>
       <div class="grid">
         <div>
           <div class="field">
@@ -68,7 +85,6 @@ footer{text-align:center;padding:18px;color:#7186a2;font-size:12px}
           <button id="generateBtn" type="button">Generate Image</button>
           <div id="imageStatus" class="status" role="status"></div>
           <a id="imageDownload" class="download" download="zvarik-ai-image.png">Download Image</a>
-          <p class="smallnote">Your image generator connects to your existing Cloudflare Pages API at <code>/api/generate</code>.</p>
         </div>
         <div>
           <label>Image preview</label>
@@ -80,62 +96,98 @@ footer{text-align:center;padding:18px;color:#7186a2;font-size:12px}
 
   <section id="videoPanel" class="panel">
     <div class="card">
-      <h1>Image to Motion Video</h1>
-      <p class="sub">Upload an image and make a short MP4 video with a zoom or pan effect. This animates the still image; it does not generate new AI movement.</p>
+      <h1>AI Story Video Studio</h1>
+      <p class="sub">Write your idea. The AI plans scenes, characters, camera moves (zoom, pan, front, back, side) and emotional voices. You can edit every scene, then create the video.</p>
       <div class="grid">
         <div>
-          <div class="field"><label for="videoImage">Choose an image</label><input id="videoImage" type="file" accept="image/*"></div>
-          <div class="field"><label for="videoPrompt">Optional scene note</label>
-            <textarea id="videoPrompt" maxlength="500" placeholder="Example: A peaceful cinematic scene, gentle camera movement, warm sunset lighting."></textarea>
-            <div class="counter"><span id="videoPromptCount">0</span>/500 characters</div>
+          <div class="field">
+            <label for="vPrompt">Your video idea</label>
+            <textarea id="vPrompt" maxlength="3000" placeholder="Example: Ek gareeb larka raat ko apni maa ke liye dawai dhundta hai. Pehle wo udaas hai, phir ek nek insaan uski madad karta hai aur akhir me wo khush ho jata hai."></textarea>
+            <div class="counter"><span id="vPromptCount">0</span>/3000 characters</div>
           </div>
           <div class="row">
-            <div class="field"><label for="videoDuration">Duration</label><select id="videoDuration"><option value="5">5 seconds</option><option value="8">8 seconds</option><option value="10">10 seconds</option></select></div>
-            <div class="field"><label for="motionStyle">Motion</label><select id="motionStyle"><option value="cinematic">Cinematic zoom</option><option value="zoom">Zoom in</option><option value="zoomout">Zoom out</option><option value="panleft">Pan left</option><option value="panright">Pan right</option></select></div>
+            <div class="field"><label for="vLang">Language of voice</label>
+              <select id="vLang"><option value="auto">Auto detect</option><option value="ur">Urdu</option><option value="hi">Hindi</option><option value="en">English</option></select>
+            </div>
+            <div class="field"><label for="vScenes">Number of scenes</label>
+              <select id="vScenes"><option>4</option><option selected>6</option><option>8</option><option>10</option></select>
+            </div>
           </div>
-          <button id="videoGenerateBtn" type="button">Create Video</button>
-          <div id="videoStatus" class="status" role="status">Choose an image to get started. MP4 conversion may take a little while on slower devices.</div>
+          <div class="row">
+            <div class="field"><label for="vStyle">Visual style</label>
+              <select id="vStyle"><option>Cinematic</option><option>Realistic</option><option>3D Animation</option><option>Cute 3D Character</option><option>Cartoon</option><option>Anime</option><option>Islamic Art</option><option>Fantasy</option><option>Digital Art</option><option>Watercolor</option><option>Comic Book</option></select>
+            </div>
+            <div class="field"><label for="vShape">Video shape</label>
+              <select id="vShape"><option value="landscape">Landscape 16:9</option><option value="portrait">Portrait 9:16</option></select>
+            </div>
+          </div>
+          <label class="check"><input type="checkbox" id="vVoice" checked> Add emotional voice</label>
+          <label class="check"><input type="checkbox" id="vCaptions" checked> Show subtitles</label>
+          <label class="check"><input type="checkbox" id="vMp4" checked> Convert to MP4 (slower, falls back to WebM)</label>
+          <button id="planBtn" type="button">1. Plan scenes</button>
+          <div id="videoStatus" class="status" role="status">Write your idea and press Plan scenes.</div>
+          <div class="bar" id="vBarWrap"><div id="vBar"></div></div>
           <a id="videoDownload" class="download" download="zvarik-ai-video.mp4">Download Video</a>
-          <p class="smallnote">The browser first records the motion effect. It then tries to convert it to MP4. If the converter cannot load, it will offer a WebM video instead so the result is not lost.</p>
+          <p class="smallnote">The video is recorded live in your browser, so keep this tab open and visible until it finishes. Use Chrome or Edge.</p>
         </div>
         <div>
           <label>Video preview</label>
-          <div class="preview" id="videoPreviewBox"><div class="placeholder" id="videoPlaceholder"><span class="emoji">🎞️</span>Your motion video will appear here.</div><video id="videoPreview" class="videoPreview" controls playsinline></video></div>
+          <div class="preview" id="videoPreviewBox">
+            <div class="placeholder" id="videoPlaceholder"><span class="emoji">🎞️</span>Your video will appear here.</div>
+            <canvas id="vCanvas" class="vCanvas"></canvas>
+            <video id="videoPreview" class="videoPreview" controls playsinline></video>
+          </div>
         </div>
+      </div>
+
+      <div class="scenes" id="scenesWrap">
+        <h2>🎬 <span id="planTitle">Storyboard</span></h2>
+        <div id="sceneList"></div>
+        <button id="createBtn" type="button">2. Create video</button>
       </div>
     </div>
   </section>
 </main>
-<footer>Zvarik AI • Free browser-based motion effects</footer>
+<footer>Zvarik AI • Image & Story Video Studio</footer>
 
 <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js"></script>
 <script src="https://unpkg.com/@ffmpeg/util@0.12.1/dist/umd/index.js"></script>
 <script>
 "use strict";
 const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+/* ---------- tabs & counters ---------- */
 document.querySelectorAll(".tab").forEach(btn => btn.addEventListener("click", () => {
   document.querySelectorAll(".tab").forEach(b => b.classList.toggle("active", b === btn));
   document.querySelectorAll(".panel").forEach(p => p.classList.toggle("active", p.id === btn.dataset.panel));
 }));
 $("prompt").addEventListener("input", () => $("promptCount").textContent = $("prompt").value.length);
-$("videoPrompt").addEventListener("input", () => $("videoPromptCount").textContent = $("videoPrompt").value.length);
+$("vPrompt").addEventListener("input", () => $("vPromptCount").textContent = $("vPrompt").value.length);
 
+/* ---------- shared: image API ---------- */
+async function requestImage(body) {
+  const response = await fetch("/api/generate", {
+    method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify(body)
+  });
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(result.error || result.message || ("Request failed (" + response.status + ")"));
+  let imageURL = result.image || result.imageUrl || result.url;
+  if (!imageURL && result.data && result.data[0] && result.data[0].url) imageURL = result.data[0].url;
+  if (!imageURL && result.data && result.data[0] && result.data[0].b64_json) imageURL = "data:image/png;base64," + result.data[0].b64_json;
+  if (!imageURL) throw new Error("The API response did not contain an image.");
+  return imageURL;
+}
+
+/* ---------- Image Studio ---------- */
 $("generateBtn").addEventListener("click", async () => {
   const prompt = $("prompt").value.trim();
   const status = $("imageStatus"), button = $("generateBtn"), preview = $("imagePreview"), download = $("imageDownload");
   if (!prompt) { status.textContent = "Please enter an image prompt first."; $("prompt").focus(); return; }
   button.disabled = true; button.textContent = "Generating..."; status.textContent = "Generating image. Please wait..."; download.style.display = "none";
   try {
-    const response = await fetch("/api/generate", {
-      method: "POST", headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({prompt, style:$("style").value, size:$("size").value})
-    });
-    const result = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(result.error || result.message || ("Request failed (" + response.status + ")"));
-    let imageURL = result.image || result.imageUrl || result.url;
-    if (!imageURL && result.data && result.data[0] && result.data[0].url) imageURL = result.data[0].url;
-    if (!imageURL && result.data && result.data[0] && result.data[0].b64_json) imageURL = "data:image/png;base64," + result.data[0].b64_json;
-    if (!imageURL) throw new Error("The API response did not contain an image. Check functions/api/generate.js.");
+    const imageURL = await requestImage({prompt, style:$("style").value, size:$("size").value});
     preview.innerHTML = "";
     const img = document.createElement("img"); img.alt = prompt; img.src = imageURL; preview.appendChild(img);
     download.href = imageURL; download.download = "zvarik-ai-image.png"; download.style.display = "block";
@@ -145,93 +197,269 @@ $("generateBtn").addEventListener("click", async () => {
   } finally { button.disabled = false; button.textContent = "Generate Image"; }
 });
 
-let selectedImage = null;
-$("videoImage").addEventListener("change", () => {
-  const file = $("videoImage").files && $("videoImage").files[0];
-  if (!file) { selectedImage = null; return; }
-  if (!file.type.startsWith("image/")) { $("videoStatus").textContent = "Please choose a valid image file."; return; }
-  selectedImage = file;
-  const url = URL.createObjectURL(file);
-  // Keep the video element in the DOM. Clearing box.innerHTML here would
-  // delete it, causing the later preview.style access to fail.
-  let img = $("selectedVideoImagePreview");
-  if (!img) {
-    img = document.createElement("img");
-    img.id = "selectedVideoImagePreview";
-    img.alt = "Selected image";
-    img.style.maxWidth = "100%";
-    img.style.maxHeight = "460px";
-    img.style.objectFit = "contain";
-    img.style.borderRadius = "9px";
-    $("videoPreviewBox").insertBefore(img, $("videoPreview"));
-  }
-  img.src = url;
-  img.style.display = "block";
-  $("videoPreview").style.display = "none";
-  const placeholder = $("videoPlaceholder");
-  if (placeholder) placeholder.style.display = "none";
-  $("videoStatus").textContent = "Image ready. Press Create Video.";
-  $("videoDownload").style.display = "none";
+/* ---------- Video Studio: constants ---------- */
+const CAMERAS = [["zoom_in","Zoom in"],["zoom_out","Zoom out"],["pan_left","Pan left"],["pan_right","Pan right"],["tilt_up","Tilt up"],["tilt_down","Tilt down"],["push_to_face","Push to face"],["pull_back","Pull back"],["static","Static"]];
+const ANGLES = [["front","Front (face)"],["side","Side"],["back","From behind"],["over_shoulder","Over shoulder"],["low","Low angle"],["high","High angle"]];
+const EMOTIONS = [["neutral","Neutral"],["sad","Sad"],["happy","Happy"],["angry","Angry"],["fear","Fear"],["excited","Excited"],["calm","Calm"],["serious","Serious"],["surprised","Surprised"],["loving","Loving"]];
+const ANGLE_TEXT = {
+  front:"front view, character facing the camera", side:"side profile view", back:"seen from behind, back to the camera",
+  over_shoulder:"over-the-shoulder shot", low:"low angle shot looking up", high:"high angle shot looking down"
+};
+const FONT_STACK = '"Noto Naskh Arabic","Noto Sans Devanagari","Segoe UI",Arial,sans-serif';
+
+let storyboard = null;
+let busy = false;
+
+function setVStatus(t) { $("videoStatus").textContent = t; }
+function setBar(p) { $("vBarWrap").style.display = "block"; $("vBar").style.width = Math.max(0, Math.min(100, p)) + "%"; }
+function opts(list, sel) { return list.map(([v,l]) => `<option value="${v}"${v===sel?" selected":""}>${l}</option>`).join(""); }
+
+/* ---------- Step 1: plan ---------- */
+$("planBtn").addEventListener("click", async () => {
+  if (busy) return;
+  const prompt = $("vPrompt").value.trim();
+  if (!prompt) { setVStatus("Please write your video idea first."); $("vPrompt").focus(); return; }
+  busy = true; const btn = $("planBtn"); btn.disabled = true; btn.textContent = "Planning scenes...";
+  setVStatus("The AI director is planning your story, characters and camera moves...");
+  try {
+    const res = await fetch("/api/storyboard", {
+      method: "POST", headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({prompt, language:$("vLang").value, scenes:Number($("vScenes").value)})
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || ("Request failed (" + res.status + ")"));
+    storyboard = data.storyboard;
+    renderScenes();
+    setVStatus("Storyboard ready. Check or edit the scenes below, then press Create video.");
+  } catch (err) {
+    setVStatus("Planning failed: " + (err.message || err) + ". Please try again.");
+  } finally { busy = false; btn.disabled = false; btn.textContent = "1. Plan scenes"; }
 });
 
-function waitForEvent(target, eventName, timeoutMs=30000) {
-  return new Promise((resolve, reject) => {
-    const timer = setTimeout(() => { cleanup(); reject(new Error("Timed out while loading media.")); }, timeoutMs);
-    const cleanup = () => { clearTimeout(timer); target.removeEventListener("loadedmetadata", onReady); target.removeEventListener("error", onError); };
-    const onReady = () => { cleanup(); resolve(); };
-    const onError = () => { cleanup(); reject(new Error("The selected image could not be loaded.")); };
-    target.addEventListener("loadedmetadata", onReady, {once:true});
-    target.addEventListener("error", onError, {once:true});
+function renderScenes() {
+  $("scenesWrap").style.display = "block";
+  $("planTitle").textContent = storyboard.title || "Storyboard";
+  const list = $("sceneList"); list.innerHTML = "";
+  storyboard.scenes.forEach((sc, i) => {
+    const d = document.createElement("div"); d.className = "scene";
+    d.innerHTML = `
+      <div class="sceneHead"><b>Scene ${i+1}</b><span class="sstat" id="sstat${i}"></span></div>
+      <div class="sceneBody">
+        <div class="thumbBox">
+          <div class="thumbEmpty" id="thumbEmpty${i}">Image appears here</div>
+          <img class="thumb" id="thumb${i}" alt="" style="display:none">
+          <button type="button" class="ghost mini" data-redo="${i}">Redo image on next create</button>
+        </div>
+        <div>
+          <div class="row4">
+            <div><label>Speaker</label><input type="text" data-i="${i}" data-k="speaker" value="${esc(sc.speaker)}"></div>
+            <div><label>Emotion / tone</label><select data-i="${i}" data-k="emotion">${opts(EMOTIONS, sc.emotion)}</select></div>
+            <div><label>Camera move</label><select data-i="${i}" data-k="camera">${opts(CAMERAS, sc.camera)}</select></div>
+            <div><label>Camera angle</label><select data-i="${i}" data-k="angle">${opts(ANGLES, sc.angle)}</select></div>
+          </div>
+          <div class="field"><label>Spoken line</label><textarea dir="auto" data-i="${i}" data-k="line">${esc(sc.line)}</textarea></div>
+          <details><summary>Image description (English)</summary>
+            <textarea data-i="${i}" data-k="image_prompt">${esc(sc.image_prompt)}</textarea>
+          </details>
+        </div>
+      </div>`;
+    list.appendChild(d);
   });
 }
-function loadImage(file) {
+$("sceneList").addEventListener("input", (e) => {
+  const el = e.target, k = el.dataset.k;
+  if (!k) return;
+  storyboard.scenes[Number(el.dataset.i)][k] = el.value;
+});
+$("sceneList").addEventListener("change", (e) => {
+  const el = e.target, k = el.dataset.k;
+  if (!k) return;
+  storyboard.scenes[Number(el.dataset.i)][k] = el.value;
+});
+$("sceneList").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-redo]");
+  if (!b) return;
+  const i = Number(b.dataset.redo);
+  storyboard.scenes[i]._imgKey = null; storyboard.scenes[i]._img = null;
+  $("sstat" + i).textContent = "New image will be made";
+});
+
+/* ---------- helpers: images, voices ---------- */
+function sceneImagePrompt(sc) {
+  return `${sc.image_prompt}. Camera: ${ANGLE_TEXT[sc.angle] || ANGLE_TEXT.front}. No text, no letters, no watermark.`;
+}
+function loadImage(src) {
   return new Promise((resolve, reject) => {
-    const url = URL.createObjectURL(file), img = new Image();
-    img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
-    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("Could not read the selected image.")); };
-    img.src = url;
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error("Could not load the generated image."));
+    img.src = src;
   });
 }
-function makeMotionCanvas(img, duration, motion) {
-  const canvas = document.createElement("canvas");
-  const maxW = 1280, maxH = 1280, scale = Math.min(1, maxW/img.width, maxH/img.height);
-  canvas.width = Math.max(2, Math.round(img.width*scale)); canvas.height = Math.max(2, Math.round(img.height*scale));
-  const ctx = canvas.getContext("2d");
-  const fps = 24, totalFrames = duration*fps; let frame = 0;
-  function draw() {
-    const t = frame / Math.max(1,totalFrames-1);
-    ctx.fillStyle = "#000"; ctx.fillRect(0,0,canvas.width,canvas.height);
-    let zoom = 1, x = 0, y = 0;
-    if (motion === "zoom" || motion === "cinematic") zoom = 1 + t*(motion==="cinematic" ? .13 : .2);
-    else if (motion === "zoomout") zoom = 1.2 - t*.2;
-    else if (motion === "panleft") x = (t-.5)*canvas.width*.12;
-    else if (motion === "panright") x = (.5-t)*canvas.width*.12;
-    const iw = canvas.width*zoom, ih = canvas.height*zoom;
-    ctx.save(); ctx.translate(canvas.width/2+x, canvas.height/2+y); ctx.drawImage(img,-iw/2,-ih/2,iw,ih); ctx.restore();
-    frame++;
-    if (frame < totalFrames) requestAnimationFrame(draw); else recorderStop();
+async function getSceneImage(sc, style, shape) {
+  const prompt = sceneImagePrompt(sc);
+  const key = [prompt, style, shape].join("|");
+  if (sc._img && sc._imgKey === key) return sc._img;
+  let lastErr;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const url = await requestImage({prompt, style, size: shape, skipEnhance: true});
+      sc._img = await loadImage(url); sc._imgKey = key; sc._imgUrl = url;
+      return sc._img;
+    } catch (e) { lastErr = e; await sleep(1500 * (attempt + 1)); }
   }
-  let recorder, chunks = [], stopResolve, stopReject;
-  const mime = MediaRecorder.isTypeSupported("video/webm;codecs=vp9") ? "video/webm;codecs=vp9" :
-    (MediaRecorder.isTypeSupported("video/webm;codecs=vp8") ? "video/webm;codecs=vp8" : "video/webm");
-  const stream = canvas.captureStream(fps);
-  recorder = new MediaRecorder(stream, {mimeType:mime});
-  const finished = new Promise((resolve,reject) => { stopResolve=resolve; stopReject=reject; });
-  recorder.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
-  recorder.onerror = e => stopReject(e.error || new Error("Browser video recording failed."));
-  recorder.onstop = () => { stream.getTracks().forEach(t=>t.stop()); stopResolve(new Blob(chunks,{type:"video/webm"})); };
-  function recorderStop(){ if (recorder && recorder.state !== "inactive") recorder.stop(); }
-  recorder.start(250); draw();
-  return finished;
+  throw lastErr;
 }
+
+function assignVoices() {
+  const female = ["Kore","Aoede","Zephyr"], male = ["Orus","Puck","Fenrir"];
+  const chars = storyboard.characters || [];
+  const genderOf = (name) => {
+    const c = chars.find(c => c.name.trim().toLowerCase() === name.trim().toLowerCase());
+    return c ? c.gender : "male";
+  };
+  const map = {}; let f = 0, m = 0;
+  storyboard.scenes.forEach(sc => {
+    const name = (sc.speaker || "Narrator").trim();
+    if (map[name]) return;
+    if (/^narrator$/i.test(name)) { map[name] = "Charon"; return; }
+    const g = genderOf(name);
+    if (g === "child") map[name] = "Leda";
+    else if (g === "female") map[name] = female[f++ % female.length];
+    else map[name] = male[m++ % male.length];
+  });
+  return map;
+}
+
+async function getSceneAudio(sc, voice, actx) {
+  const key = [sc.line, sc.emotion, voice].join("|");
+  if (sc._aud && sc._audKey === key) return sc._aud;
+  let lastErr;
+  for (let attempt = 0; attempt < 4; attempt++) {
+    try {
+      const res = await fetch("/api/tts", {
+        method: "POST", headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({text: sc.line, emotion: sc.emotion, voice})
+      });
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        const err = new Error(j.error || ("Voice request failed (" + res.status + ")"));
+        err.status = res.status; throw err;
+      }
+      const buf = await actx.decodeAudioData(await res.arrayBuffer());
+      sc._aud = buf; sc._audKey = key;
+      return buf;
+    } catch (e) {
+      lastErr = e;
+      if (e.status === 500 && /GEMINI_API_KEY/.test(e.message)) throw e; // no point retrying
+      await sleep(e.status === 429 ? 8000 * (attempt + 1) : 2000 * (attempt + 1));
+    }
+  }
+  throw lastErr;
+}
+
+/* ---------- camera engine ---------- */
+function camView(cam, u) {
+  const e = u * u * (3 - 2 * u); // ease in-out
+  switch (cam) {
+    case "zoom_in":       return {s: 1 + .28 * e, fx: .5, fy: .5};
+    case "zoom_out":      return {s: 1.28 - .28 * e, fx: .5, fy: .5};
+    case "pan_left":      return {s: 1.3, fx: .6 - .2 * e, fy: .5};
+    case "pan_right":     return {s: 1.3, fx: .4 + .2 * e, fy: .5};
+    case "tilt_up":       return {s: 1.3, fx: .5, fy: .6 - .2 * e};
+    case "tilt_down":     return {s: 1.3, fx: .5, fy: .4 + .2 * e};
+    case "push_to_face":  return {s: 1 + .55 * e, fx: .5, fy: .5 - .12 * e};
+    case "pull_back":     return {s: 1.55 - .5 * e, fx: .5, fy: .38 + .12 * e};
+    default:              return {s: 1.04 + .03 * e, fx: .5, fy: .5};
+  }
+}
+function drawScene(c, img, W, H, cam, u) {
+  const iw = img.naturalWidth, ih = img.naturalHeight, ia = iw / ih, ca = W / H;
+  let bw, bh, bx, by;
+  if (ia > ca) { bh = ih; bw = ih * ca; bx = (iw - bw) / 2; by = 0; }
+  else { bw = iw; bh = iw / ca; bx = 0; by = (ih - bh) / 2; }
+  const v = camView(cam, u);
+  const sw = bw / v.s, sh = bh / v.s;
+  let sx = bx + v.fx * bw - sw / 2, sy = by + v.fy * bh - sh / 2;
+  sx = Math.max(bx, Math.min(bx + bw - sw, sx));
+  sy = Math.max(by, Math.min(by + bh - sh, sy));
+  c.drawImage(img, sx, sy, sw, sh, 0, 0, W, H);
+}
+function drawCaption(c, text, W, H, rtl) {
+  const fs = Math.round(Math.min(W, H) * (W > H ? 0.05 : 0.045));
+  c.font = `700 ${fs}px ${FONT_STACK}`;
+  c.textAlign = "center"; c.textBaseline = "middle"; c.direction = rtl ? "rtl" : "ltr";
+  const maxW = W * 0.86, words = text.split(/\s+/), lines = []; let cur = "";
+  words.forEach(w => {
+    const t = cur ? cur + " " + w : w;
+    if (c.measureText(t).width > maxW && cur) { lines.push(cur); cur = w; } else cur = t;
+  });
+  if (cur) lines.push(cur);
+  const shown = lines.slice(0, 4), lh = fs * 1.35, boxH = shown.length * lh + fs * .6;
+  const y0 = H - boxH - H * 0.05;
+  c.fillStyle = "rgba(0,0,0,.55)";
+  const bw = Math.min(W * 0.92, Math.max(...shown.map(l => c.measureText(l).width)) + fs * 1.2);
+  c.beginPath(); c.roundRect ? c.roundRect((W - bw) / 2, y0, bw, boxH, fs * .4) : c.rect((W - bw) / 2, y0, bw, boxH); c.fill();
+  c.fillStyle = "#fff";
+  shown.forEach((l, i) => c.fillText(l, W / 2, y0 + fs * .3 + lh * (i + .5)));
+}
+
+/* ---------- recording ---------- */
+function renderVideo(scenes, W, H, actx, showCaptions, rtl, onProgress) {
+  const canvas = $("vCanvas"); canvas.width = W; canvas.height = H;
+  $("videoPlaceholder").style.display = "none"; $("videoPreview").style.display = "none"; canvas.style.display = "block";
+  const c = canvas.getContext("2d");
+  const dest = actx.createMediaStreamDestination();
+  const stream = new MediaStream([...canvas.captureStream(30).getVideoTracks(), ...dest.stream.getAudioTracks()]);
+  const mimes = ["video/webm;codecs=vp9,opus", "video/webm;codecs=vp8,opus", "video/webm"];
+  const mime = mimes.find(m => MediaRecorder.isTypeSupported(m)) || "video/webm";
+  const rec = new MediaRecorder(stream, {mimeType: mime, videoBitsPerSecond: 5000000});
+  const chunks = [];
+  rec.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
+
+  let acc = 0; scenes.forEach(s => { s._start = acc; acc += s._dur; });
+  const total = acc, T0 = actx.currentTime + 0.5;
+  scenes.forEach(s => {
+    if (!s._aud) return;
+    const src = actx.createBufferSource(); src.buffer = s._aud;
+    src.connect(dest); src.connect(actx.destination);
+    src.start(T0 + s._start + 0.35);
+  });
+
+  return new Promise((resolve, reject) => {
+    rec.onerror = e => reject(e.error || new Error("Browser video recording failed."));
+    rec.onstop = () => resolve(new Blob(chunks, {type: "video/webm"}));
+    function draw(t) {
+      let idx = scenes.length - 1;
+      for (let i = 0; i < scenes.length; i++) if (t < scenes[i]._start + scenes[i]._dur) { idx = i; break; }
+      const s = scenes[idx], local = t - s._start, u = Math.max(0, Math.min(1, local / s._dur));
+      c.fillStyle = "#000"; c.fillRect(0, 0, W, H);
+      drawScene(c, s._img, W, H, s.camera, u);
+      if (showCaptions && s.line && local > 0.3 && local < s._dur - 0.1) drawCaption(c, s.line, W, H, rtl);
+      let fade = 1;
+      if (local < 0.4) fade = Math.min(fade, local / 0.4);
+      if (t > total - 0.5) fade = Math.min(fade, Math.max(0, (total - t) / 0.5));
+      if (fade < 1) { c.fillStyle = `rgba(0,0,0,${1 - fade})`; c.fillRect(0, 0, W, H); }
+    }
+    function frame() {
+      const t = actx.currentTime - T0;
+      if (t >= total) { draw(Math.max(0, total - 0.001)); setTimeout(() => rec.state !== "inactive" && rec.stop(), 300); return; }
+      draw(Math.max(0, t)); onProgress(Math.max(0, t) / total);
+      requestAnimationFrame(frame);
+    }
+    rec.start(500);
+    requestAnimationFrame(frame);
+  });
+}
+
+/* ---------- MP4 conversion ---------- */
 let ffmpegInstance = null;
-async function convertToMP4(webmBlob, status) {
+async function convertToMP4(webmBlob, onLog) {
   if (!window.FFmpeg || !window.FFmpegUtil) throw new Error("MP4 converter libraries did not load.");
-  const { FFmpeg } = window.FFmpeg;
-  const { toBlobURL } = window.FFmpegUtil;
+  const { FFmpeg } = window.FFmpeg, { toBlobURL } = window.FFmpegUtil;
   if (!ffmpegInstance) {
     ffmpegInstance = new FFmpeg();
-    ffmpegInstance.on("log", ({message}) => { if (message && /frame=|error/i.test(message)) status.textContent = "Converting to MP4... " + message.slice(0,100); });
+    ffmpegInstance.on("log", ({message}) => { if (message && /frame=/i.test(message)) onLog("Converting to MP4... " + message.slice(0, 90)); });
     const base = "https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd";
     const workerURL = await toBlobURL("https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/814.ffmpeg.js", "text/javascript");
     await ffmpegInstance.load({
@@ -241,36 +469,86 @@ async function convertToMP4(webmBlob, status) {
     });
   }
   await ffmpegInstance.writeFile("input.webm", new Uint8Array(await webmBlob.arrayBuffer()));
-  await ffmpegInstance.exec(["-i","input.webm","-c:v","libx264","-preset","ultrafast","-pix_fmt","yuv420p","-movflags","+faststart","-an","output.mp4"]);
+  await ffmpegInstance.exec(["-i","input.webm","-c:v","libx264","-preset","ultrafast","-pix_fmt","yuv420p","-c:a","aac","-b:a","128k","-movflags","+faststart","output.mp4"]);
   const data = await ffmpegInstance.readFile("output.mp4");
-  return new Blob([data.buffer.slice(data.byteOffset,data.byteOffset+data.byteLength)], {type:"video/mp4"});
+  return new Blob([data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength)], {type: "video/mp4"});
 }
-$("videoGenerateBtn").addEventListener("click", async () => {
-  const button=$("videoGenerateBtn"), status=$("videoStatus"), link=$("videoDownload"), preview=$("videoPreview");
-  if (!selectedImage) { status.textContent = "Please choose an image first."; return; }
-  if (!window.MediaRecorder || !HTMLCanvasElement.prototype.captureStream) { status.textContent = "This browser does not support video recording. Please use an updated Chrome or Edge browser."; return; }
-  button.disabled=true; button.textContent="Creating video..."; link.style.display="none"; status.textContent="Preparing image motion...";
+
+/* ---------- Step 2: create ---------- */
+$("createBtn").addEventListener("click", async () => {
+  if (busy) return;
+  if (!storyboard || !storyboard.scenes.length) { setVStatus("Please plan the scenes first."); return; }
+  if (!window.MediaRecorder || !HTMLCanvasElement.prototype.captureStream) {
+    setVStatus("This browser cannot record video. Please use an updated Chrome or Edge."); return;
+  }
+  busy = true;
+  const btn = $("createBtn"), planBtn = $("planBtn"), link = $("videoDownload");
+  btn.disabled = true; planBtn.disabled = true; btn.textContent = "Creating video..."; link.style.display = "none";
+
+  const AC = window.AudioContext || window.webkitAudioContext;
+  const actx = new AC(); try { await actx.resume(); } catch (e) {}
+
+  const style = $("vStyle").value, shape = $("vShape").value;
+  const W = shape === "portrait" ? 720 : 1280, H = shape === "portrait" ? 1280 : 720;
+  const wantVoice = $("vVoice").checked, showCaptions = $("vCaptions").checked;
+  const scenes = storyboard.scenes.filter(s => s.image_prompt && s.image_prompt.trim());
+  const rtl = storyboard.language === "ur";
+  const voices = assignVoices();
+  let voiceWarned = false;
+
   try {
-    const img=await loadImage(selectedImage);
-    const webm=await makeMotionCanvas(img, Number($("videoDuration").value), $("motionStyle").value);
-    status.textContent="Motion recorded. Trying to convert to MP4...";
-    let output=webm, filename="zvarik-ai-video.webm";
-    try {
-      output=await convertToMP4(webm,status); filename="zvarik-ai-video.mp4";
-      status.textContent="MP4 video created successfully.";
-    } catch (conversionError) {
-      console.warn("MP4 conversion unavailable; using WebM instead.", conversionError);
-      status.textContent="MP4 converter could not load, but your video is ready in WebM format. Most modern browsers can play it.";
+    try { await Promise.all([document.fonts.load(`700 30px "Noto Naskh Arabic"`), document.fonts.load(`700 30px "Noto Sans Devanagari"`)]); } catch (e) {}
+
+    const steps = scenes.length * (wantVoice ? 2 : 1) + 1; let done = 0;
+    for (let i = 0; i < scenes.length; i++) {
+      const sc = scenes[i], stat = $("sstat" + i);
+      stat.textContent = "Making image...";
+      setVStatus(`Scene ${i + 1} of ${scenes.length}: creating image...`);
+      await getSceneImage(sc, style, shape);
+      const thumb = $("thumb" + i); thumb.src = sc._imgUrl || thumb.src; thumb.style.display = "block"; $("thumbEmpty" + i).style.display = "none";
+      setBar((++done / steps) * 100);
+
+      sc._aud = wantVoice ? sc._aud : null;
+      if (wantVoice && sc.line.trim()) {
+        stat.textContent = "Recording voice...";
+        setVStatus(`Scene ${i + 1} of ${scenes.length}: recording ${sc.emotion} voice...`);
+        try {
+          await getSceneAudio(sc, voices[(sc.speaker || "Narrator").trim()] || "Charon", actx);
+        } catch (e) {
+          sc._aud = null;
+          if (!voiceWarned) { voiceWarned = true; setVStatus("Voice failed: " + (e.message || e) + " The video will continue without that voice."); await sleep(2500); }
+        }
+      }
+      setBar((++done / steps) * 100);
+      const words = sc.line.trim().split(/\s+/).filter(Boolean).length;
+      sc._dur = sc._aud ? Math.max(3.2, sc._aud.duration + 1.0) : Math.max(3.5, words * 0.45 + 1);
+      stat.textContent = "Ready (" + sc._dur.toFixed(1) + "s)";
     }
-    const url=URL.createObjectURL(output);
-    preview.style.display="block"; preview.src=url; preview.load();
-    const selectedPreview = $("selectedVideoImagePreview");
-    if (selectedPreview) selectedPreview.style.display = "none";
-    const placeholder=$("videoPlaceholder"); if(placeholder) placeholder.style.display="none";
-    link.href=url; link.download=filename; link.textContent=filename.endsWith(".mp4")?"Download MP4 Video":"Download Video (WebM)"; link.style.display="block";
-  } catch(err) {
-    status.textContent="Video creation failed: "+(err.message||err)+". Try a smaller image or a newer version of Chrome.";
-  } finally { button.disabled=false; button.textContent="Create Video"; }
+
+    setVStatus("Recording the final video live. Please keep this tab open and visible...");
+    const webm = await renderVideo(scenes, W, H, actx, showCaptions, rtl, p => setBar(((steps - 1 + p) / steps) * 100));
+
+    let output = webm, filename = "zvarik-ai-video.webm";
+    if ($("vMp4").checked) {
+      setVStatus("Video recorded. Converting to MP4...");
+      try { output = await convertToMP4(webm, setVStatus); filename = "zvarik-ai-video.mp4"; }
+      catch (e) { console.warn("MP4 conversion unavailable; using WebM.", e); }
+    }
+
+    const url = URL.createObjectURL(output), vid = $("videoPreview");
+    $("vCanvas").style.display = "none"; vid.style.display = "block"; vid.src = url; vid.load();
+    link.href = url; link.download = filename;
+    link.textContent = filename.endsWith(".mp4") ? "Download MP4 Video" : "Download Video (WebM)"; link.style.display = "block";
+    setBar(100);
+    setVStatus(filename.endsWith(".mp4") ? "Your video is ready." : "Your video is ready (WebM format, plays in Chrome, Edge and most players).");
+  } catch (err) {
+    console.error(err);
+    setVStatus("Video creation failed: " + (err.message || err) + ". Press Create video again; finished images and voices are kept.");
+    $("vCanvas").style.display = "none";
+  } finally {
+    try { actx.close(); } catch (e) {}
+    busy = false; btn.disabled = false; planBtn.disabled = false; btn.textContent = "2. Create video";
+  }
 });
 </script>
 </body>
